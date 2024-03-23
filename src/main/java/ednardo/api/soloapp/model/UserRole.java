@@ -5,14 +5,14 @@ import ednardo.api.soloapp.enums.RoleName;
 import javax.persistence.*;
 
 @Entity
-@Table(name="roles")
-public class Role {
+@Table(name="user_roles")
+public class UserRole {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    @Enumerated(EnumType.STRING)
-    private RoleName name;
+
+    private String role;
 
     public Long getId() {
         return id;
@@ -22,11 +22,11 @@ public class Role {
         this.id = id;
     }
 
-    public RoleName getName() {
-        return name;
+    public String getRole() {
+        return role;
     }
 
-    public void setName(RoleName name) {
-        this.name = name;
+    public void setRole(String role) {
+        this.role = role;
     }
 }
