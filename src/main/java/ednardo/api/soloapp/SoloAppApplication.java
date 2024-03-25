@@ -6,7 +6,9 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.ComponentScan;
 
 @SpringBootApplication
-@ComponentScan("ednardo.api.soloapp.repository")
+//@ComponentScan(basePackages = {"ednardo.api.soloapp"})
+
+//@EnableAutoConfiguration
 public class SoloAppApplication {
 
 	public static void main(String[] args) {

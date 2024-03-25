@@ -1,6 +1,8 @@
 package ednardo.api.soloapp.model;
 
-import javax.persistence.*;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
+import jakarta.persistence.*;
 import java.util.List;
 
 @Entity
@@ -13,16 +15,18 @@ public class User {
     @Column(unique = true)
     private String email;
     private String password;
-    private String name;
+    @Column(name = "first_name")
+    private String firstName;
     @Column(name = "last_name")
     private String lastName;
+    @JsonIgnore
     private boolean active;
 
-    @ManyToMany(fetch = FetchType.EAGER, cascade = CascadeType.PERSIST)
-    @JoinTable(name="user_roles",
-            joinColumns = @JoinColumn(name = "user_id"),
-            inverseJoinColumns = @JoinColumn(name="role_id"))
-    private List<UserRole> userRoles;
+//    @ManyToMany(fetch = FetchType.EAGER, cascade = CascadeType.PERSIST)
+//    @JoinTable(name="user_roles",
+//            joinColumns = @JoinColumn(name = "user_id"),
+//            inverseJoinColumns = @JoinColumn(name="role_id"))
+//    private List<UserRole> userRoles;
 
 //    private List<Activity> activities;
 
@@ -50,12 +54,12 @@ public class User {
         this.password = password;
     }
 
-    public String getName() {
-        return name;
+    public String getFirstName() {
+        return firstName;
     }
 
-    public void setName(String name) {
-        this.name = name;
+    public void setFirstName(String firstName) {
+        this.firstName = firstName;
     }
 
     public String getLastName() {
@@ -66,7 +70,7 @@ public class User {
         this.lastName = lastName;
     }
 
-    public boolean isActive() {
+    public boolean getActive() {
         return active;
     }
 
@@ -74,21 +78,21 @@ public class User {
         this.active = active;
     }
 
-    public List<UserRole> getRoles() {
-        return userRoles;
-    }
-
-    public void setRoles(List<UserRole> userRoles) {
-        this.userRoles = userRoles;
-    }
-
-    public List<UserRole> getUserRoles() {
-        return userRoles;
-    }
-
-    public void setUserRoles(List<UserRole> userRoles) {
-        this.userRoles = userRoles;
-    }
+//    public List<UserRole> getRoles() {
+//        return userRoles;
+//    }
+//
+//    public void setRoles(List<UserRole> userRoles) {
+//        this.userRoles = userRoles;
+//    }
+//
+//    public List<UserRole> getUserRoles() {
+//        return userRoles;
+//    }
+//
+//    public void setUserRoles(List<UserRole> userRoles) {
+//        this.userRoles = userRoles;
+//    }
 
     //    public List<Activity> getActivities() {
 //        return activities;

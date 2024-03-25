@@ -2,13 +2,14 @@ package ednardo.api.soloapp.model;
 
 import ednardo.api.soloapp.enums.RoleName;
 
-import javax.persistence.*;
+import jakarta.persistence.*;
 
 @Entity
 @Table(name="user_roles")
 public class UserRole {
 
     @Id
+    @Column(name = "role_id")
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 

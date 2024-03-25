@@ -1,7 +1,9 @@
 package ednardo.api.soloapp.controller;
 
 import ednardo.api.soloapp.model.User;
+import ednardo.api.soloapp.model.dto.UserDTO;
 import ednardo.api.soloapp.service.UserService;
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -14,9 +16,9 @@ public class UserController {
     @Autowired
     UserService userService;
 
-    @PostMapping("/create")
-    public User createUser(@RequestBody User user) {
-        return userService.save(user);
+    @PostMapping("/registration")
+    public User registerUserAccount(@RequestBody @Valid UserDTO userDTO) {
+        return userService.registerNewUser(userDTO);
     }
 
 }
