@@ -14,16 +14,17 @@ public class User {
     private String email;
     private String password;
     private String name;
+    @Column(name = "last_name")
     private String lastName;
     private boolean active;
 
     @ManyToMany(fetch = FetchType.EAGER, cascade = CascadeType.PERSIST)
-    @JoinTable(name="users_roles",
+    @JoinTable(name="user_roles",
             joinColumns = @JoinColumn(name = "user_id"),
             inverseJoinColumns = @JoinColumn(name="role_id"))
     private List<UserRole> userRoles;
 
-    private List<Activity> activities;
+//    private List<Activity> activities;
 
     public Long getId() {
         return id;
@@ -81,11 +82,19 @@ public class User {
         this.userRoles = userRoles;
     }
 
-    public List<Activity> getActivities() {
-        return activities;
+    public List<UserRole> getUserRoles() {
+        return userRoles;
     }
 
-    public void setActivities(List<Activity> activities) {
-        this.activities = activities;
+    public void setUserRoles(List<UserRole> userRoles) {
+        this.userRoles = userRoles;
     }
+
+    //    public List<Activity> getActivities() {
+//        return activities;
+//    }
+//
+//    public void setActivities(List<Activity> activities) {
+//        this.activities = activities;
+//    }
 }

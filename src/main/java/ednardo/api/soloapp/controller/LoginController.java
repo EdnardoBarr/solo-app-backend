@@ -16,26 +16,9 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 public class LoginController {
+//
+//    @Autowired
+//    private AuthenticationManager authenticationManager;
 
-    @Autowired
-    private AuthenticationManager authenticationManager;
-
-    @PostMapping("authorize")
-    public ResponseEntity doLogin(@RequestBody LoginRequestDTO requestDto, HttpServletRequest request, HttpSession session) {
-        Authentication authentication = null;
-        session.invalidate();
-
-        try {
-            authentication = this.authenticationManager.authenticate(
-                    new UsernamePasswordAuthenticationToken(requestDto.getEmail(), requestDto.getPassword()));
-        } catch (Exception exception) {
-
-        }
-
-        SecurityContext securityContext = SecurityContextHolder.getContext();
-        securityContext.setAuthentication(authentication);
-
-
-
-    }
+//   a
 }
