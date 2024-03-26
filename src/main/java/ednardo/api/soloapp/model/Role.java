@@ -1,19 +1,21 @@
 package ednardo.api.soloapp.model;
 
-import ednardo.api.soloapp.enums.RoleName;
-
 import jakarta.persistence.*;
 
+import java.util.Collection;
+
 @Entity
-@Table(name="user_roles")
-public class UserRole {
+@Table(name="roles")
+public class Role {
 
     @Id
-    @Column(name = "role_id")
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     private String role;
+
+    @ManyToMany(mappedBy = "roles")
+    private Collection<User> users;
 
     public Long getId() {
         return id;
@@ -29,5 +31,13 @@ public class UserRole {
 
     public void setRole(String role) {
         this.role = role;
+    }
+
+    public Collection<User> getUsers() {
+        return users;
+    }
+
+    public void setUsers(Collection<User> users) {
+        this.users = users;
     }
 }

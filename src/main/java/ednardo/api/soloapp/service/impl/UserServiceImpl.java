@@ -1,15 +1,20 @@
 package ednardo.api.soloapp.service.impl;
 
 import ednardo.api.soloapp.exception.UserValidationException;
+import ednardo.api.soloapp.model.Role;
 import ednardo.api.soloapp.model.User;
 import ednardo.api.soloapp.model.dto.UserDTO;
 import ednardo.api.soloapp.repository.UserRepository;
 import ednardo.api.soloapp.service.UserService;
+import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.util.Collections;
+
 @Service
+@Transactional
 public class UserServiceImpl implements UserService {
     @Autowired
     UserRepository userRepository;
@@ -30,7 +35,8 @@ public class UserServiceImpl implements UserService {
             user.setFirstName(userDTO.getFirstName());
             user.setLastName(userDTO.getLastName());
             user.setPassword(passwordEncoder.encode(userDTO.getPassword()));
-            user.setEmail(user.getEmail());
+            user.setEmail(userDTO.getEmail());
+       //     user.setRoles(Collections.singletonList(roleRepository.findByName("ROLE_USER")));
             user.setActive(true);
 
             return userRepository.save(user);
@@ -38,15 +44,17 @@ public class UserServiceImpl implements UserService {
             throw new UserValidationException("Unable to save new user. Please try again.");
         }
     }
-
     @Override
     public void update(User user) {
-        User userUpdated = this.userRepository.findByEmail(user.getEmail()).orElseThrow(() -> new UserValidationException("User not found."));
+        User userUpdated = this.userRepository.findByEmail(user.getEmail());
+        if (userUpdated == null) {
+            throw new UserValidationException("User not found.");
+        }
 
         userUpdated.setFirstName(user.getFirstName());
         userUpdated.setLastName(user.getLastName());
         userUpdated.setActive(user.getActive());
-       // userUpdated.setUserRoles(user.getUserRoles());
+        userUpdated.setRoles(user.getRoles());
         userUpdated.setPassword(user.getPassword());
         userUpdated.setEmail(user.getEmail());
 
@@ -59,7 +67,11 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public void deleteByEmail(String email) {
-        User user = this.userRepository.findByEmail(email).orElseThrow(() -> new UserValidationException("User not found."));
+        User user = this.userRepository.findByEmail(email);
+
+        if (user == null) {
+            throw new UserValidationException("User not found.");
+        }
 
         try {
             user.setActive(false);

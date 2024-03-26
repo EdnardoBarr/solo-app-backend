@@ -3,6 +3,8 @@ package ednardo.api.soloapp.model;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import jakarta.persistence.*;
+
+import java.util.Collection;
 import java.util.List;
 
 @Entity
@@ -22,11 +24,11 @@ public class User {
     @JsonIgnore
     private boolean active;
 
-//    @ManyToMany(fetch = FetchType.EAGER, cascade = CascadeType.PERSIST)
-//    @JoinTable(name="user_roles",
-//            joinColumns = @JoinColumn(name = "user_id"),
-//            inverseJoinColumns = @JoinColumn(name="role_id"))
-//    private List<UserRole> userRoles;
+    @ManyToMany(fetch = FetchType.EAGER, cascade = CascadeType.PERSIST)
+    @JoinTable(name="users_roles",
+            joinColumns = @JoinColumn(name = "user_id"),
+            inverseJoinColumns = @JoinColumn(name="role_id"))
+    private Collection<Role> roles;
 
 //    private List<Activity> activities;
 
@@ -78,21 +80,13 @@ public class User {
         this.active = active;
     }
 
-//    public List<UserRole> getRoles() {
-//        return userRoles;
-//    }
-//
-//    public void setRoles(List<UserRole> userRoles) {
-//        this.userRoles = userRoles;
-//    }
-//
-//    public List<UserRole> getUserRoles() {
-//        return userRoles;
-//    }
-//
-//    public void setUserRoles(List<UserRole> userRoles) {
-//        this.userRoles = userRoles;
-//    }
+    public Collection<Role> getRoles() {
+        return roles;
+    }
+
+    public void setRoles(Collection<Role> roles) {
+        this.roles = roles;
+    }
 
     //    public List<Activity> getActivities() {
 //        return activities;
