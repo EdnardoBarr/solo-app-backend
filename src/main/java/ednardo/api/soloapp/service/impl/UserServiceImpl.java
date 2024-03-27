@@ -1,5 +1,7 @@
 package ednardo.api.soloapp.service.impl;
 
+import ednardo.api.soloapp.exception.UserAlreadyExistsException;
+import ednardo.api.soloapp.exception.UserNotFoundException;
 import ednardo.api.soloapp.exception.UserValidationException;
 import ednardo.api.soloapp.model.Role;
 import ednardo.api.soloapp.model.User;
@@ -26,7 +28,7 @@ public class UserServiceImpl implements UserService {
     public User registerNewUser(final UserDTO userDTO) {
 
         if (userRepository.existsByEmail(userDTO.getEmail())) {
-            throw new UserValidationException("This login email already exists.");
+            throw new UserAlreadyExistsException("This login email already exists.");
         }
 
         final User user = new User();
@@ -48,7 +50,7 @@ public class UserServiceImpl implements UserService {
     public void update(User user) {
         User userUpdated = this.userRepository.findByEmail(user.getEmail());
         if (userUpdated == null) {
-            throw new UserValidationException("User not found.");
+            throw new UserNotFoundException("User not found.");
         }
 
         userUpdated.setFirstName(user.getFirstName());

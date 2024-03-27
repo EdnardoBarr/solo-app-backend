@@ -1,5 +1,7 @@
 package ednardo.api.soloapp.exception.handler;
 
+import ednardo.api.soloapp.exception.UserAlreadyExistsException;
+import ednardo.api.soloapp.exception.UserNotFoundException;
 import ednardo.api.soloapp.util.GenericResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.MessageSource;
@@ -38,5 +40,12 @@ public class RestResponseEntityExceptionHandler extends ResponseEntityExceptionH
         GenericResponse bodyOfResponse = new GenericResponse(messages.getMessage("message.regError", null, request.getLocale()), "UserAlreadyExists");
 
         return handleExceptionInternal(exception, bodyOfResponse, new HttpHeaders(), HttpStatus.CONFLICT, request);
+    }
+
+    @ExceptionHandler({ UserNotFoundException.class })
+    public ResponseEntity<Object> handleUserNotFoundException (RuntimeException exception, WebRequest request) {
+        GenericResponse bodyOfResponse = new GenericResponse(messages.getMessage("message.userNotFound", null, request.getLocale()), "UserNotFound");
+
+        return handleExceptionInternal(exception, bodyOfResponse, new HttpHeaders(), HttpStatus.NOT_FOUND, request);
     }
 }

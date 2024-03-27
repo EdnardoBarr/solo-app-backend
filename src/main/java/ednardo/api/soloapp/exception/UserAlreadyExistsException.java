@@ -1,4 +1,4 @@
-package ednardo.api.soloapp.exception.handler;
+package ednardo.api.soloapp.exception;
 
 public class UserAlreadyExistsException extends RuntimeException {
 

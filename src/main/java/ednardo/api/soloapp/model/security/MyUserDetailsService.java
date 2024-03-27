@@ -1,5 +1,6 @@
 package ednardo.api.soloapp.model.security;
 
+import ednardo.api.soloapp.exception.UserNotFoundException;
 import ednardo.api.soloapp.exception.UserValidationException;
 import ednardo.api.soloapp.model.Role;
 import ednardo.api.soloapp.model.User;
@@ -16,9 +17,10 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
-@Service
+@Service("userDetailsService")
 @Transactional
-public class MyUserDetailsService implements UserDetailsService {
+public class  MyUserDetailsService implements UserDetailsService {
+    private User user;
 
     @Autowired
     private UserRepository userRepository;
@@ -30,13 +32,16 @@ public class MyUserDetailsService implements UserDetailsService {
     public UserDetails loadUserByUsername(String email) throws UserValidationException {
         User user = userRepository.findByEmail(email);
         if (user == null) {
-            throw new UserValidationException("User not found.");
+            throw new UserNotFoundException("User not found.");
         }
 
         boolean enabled = true;
         boolean accountNonExpired = true;
         boolean credentialsNonExpired = true;
         boolean accountNonLocked = true;
+//        public String getUsername() {
+//            return user.getEmail(email);
+//        }
 
         return new org.springframework.security.core.userdetails.User(user.getEmail(), user.getPassword(), enabled, accountNonExpired, credentialsNonExpired, accountNonLocked, getAuthorities(user.getRoles()));
     }
@@ -47,6 +52,12 @@ public class MyUserDetailsService implements UserDetailsService {
             authorities.add(new SimpleGrantedAuthority(role.toString()));
         }
         return authorities;
+    }
+
+    @Override
+    public String getUsername() {
+        return user.getEmail();
+
     }
 
 }

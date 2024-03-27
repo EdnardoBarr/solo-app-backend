@@ -9,6 +9,7 @@ import org.springframework.security.config.annotation.authentication.builders.Au
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityCustomizer;
+import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -27,14 +28,19 @@ public class SecurityConfig {
             "/v3/api-docs/**",
             "/swagger-resources/**",
             "/swagger-resources",
-            "/login/**"
+            "/login/**",
+            "/hello/**",
+    //        "/user/**",
+            "/swagger-ui.html",
+//            "/**"
     };
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
        // http.csrf().disable().authorizeRequests().requestMatchers(SWAGGER_WHITELIST).permitAll().anyRequest().authenticated().and().httpBasic();
         http
-                .authorizeHttpRequests(authorize -> authorize
-                        .anyRequest().authenticated()
+                .csrf().disable().authorizeHttpRequests(authorize -> authorize
+                        .requestMatchers(SWAGGER_WHITELIST).permitAll().anyRequest().authenticated()
+
                 )
                 .formLogin(withDefaults())
                 .httpBasic(withDefaults());
@@ -59,13 +65,11 @@ public class SecurityConfig {
 
         return authProvider;
     }
-
     @Bean
     public AuthenticationManager authManager(HttpSecurity http) throws Exception {
         return http.getSharedObject(AuthenticationManagerBuilder.class)
                 .authenticationProvider(authProvider())
                 .build();
     }
-
 
 }
