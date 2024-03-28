@@ -1,5 +1,6 @@
 package ednardo.api.soloapp.exception.handler;
 
+import ednardo.api.soloapp.exception.JWTException;
 import ednardo.api.soloapp.exception.UserAlreadyExistsException;
 import ednardo.api.soloapp.exception.UserNotFoundException;
 import ednardo.api.soloapp.util.GenericResponse;
@@ -47,5 +48,12 @@ public class RestResponseEntityExceptionHandler extends ResponseEntityExceptionH
         GenericResponse bodyOfResponse = new GenericResponse(messages.getMessage("message.userNotFound", null, request.getLocale()), "UserNotFound");
 
         return handleExceptionInternal(exception, bodyOfResponse, new HttpHeaders(), HttpStatus.NOT_FOUND, request);
+    }
+
+    @ExceptionHandler({ JWTException.class })
+    public ResponseEntity<Object> handleJWTException (RuntimeException exception, WebRequest request) {
+        GenericResponse bodyOfResponse = new GenericResponse(messages.getMessage("auth.message.invalidToken", null, request.getLocale()), "UserNotFound");
+
+        return handleExceptionInternal(exception, bodyOfResponse, new HttpHeaders(), HttpStatus.UNAUTHORIZED, request);
     }
 }

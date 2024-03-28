@@ -39,9 +39,6 @@ public class  MyUserDetailsService implements UserDetailsService {
         boolean accountNonExpired = true;
         boolean credentialsNonExpired = true;
         boolean accountNonLocked = true;
-//        public String getUsername() {
-//            return user.getEmail(email);
-//        }
 
         return new org.springframework.security.core.userdetails.User(user.getEmail(), user.getPassword(), enabled, accountNonExpired, credentialsNonExpired, accountNonLocked, getAuthorities(user.getRoles()));
     }
@@ -54,10 +51,6 @@ public class  MyUserDetailsService implements UserDetailsService {
         return authorities;
     }
 
-    @Override
-    public String getUsername() {
-        return user.getEmail();
 
-    }
 
 }

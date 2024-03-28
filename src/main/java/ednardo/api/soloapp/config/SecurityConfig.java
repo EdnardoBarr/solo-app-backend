@@ -23,6 +23,22 @@ public class SecurityConfig {
     @Autowired
     private UserDetailsService userDetailsService;
 
+    public static final String [] ENDPOINTS_WITH_AUTHENTICATION_NOT_REQUIRED = {
+            "/login",
+    };
+
+    public static final String [] ENDPOINTS_WITH_AUTHENTICATION_REQUIRED = {
+            "/users/test"
+    };
+
+    public static final String [] ENDPOINTS_USER = {
+            "/users/test/customer"
+    };
+
+    public static final String [] ENDPOINTS_ADMIN = {
+            "/users/test/administrator"
+    };
+
     private static final String[] SWAGGER_WHITELIST = {
             "/swagger-ui/**",
             "/v3/api-docs/**",
