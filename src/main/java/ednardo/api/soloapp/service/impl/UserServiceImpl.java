@@ -5,11 +5,19 @@ import ednardo.api.soloapp.exception.UserNotFoundException;
 import ednardo.api.soloapp.exception.UserValidationException;
 import ednardo.api.soloapp.model.Role;
 import ednardo.api.soloapp.model.User;
+import ednardo.api.soloapp.model.dto.LoginRequestDTO;
+import ednardo.api.soloapp.model.dto.RecoveryJwtTokenDTO;
 import ednardo.api.soloapp.model.dto.UserDTO;
+import ednardo.api.soloapp.model.security.JwtUtils;
+import ednardo.api.soloapp.model.security.MyUserDetailsService;
 import ednardo.api.soloapp.repository.UserRepository;
 import ednardo.api.soloapp.service.UserService;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -20,6 +28,15 @@ import java.util.Collections;
 public class UserServiceImpl implements UserService {
     @Autowired
     UserRepository userRepository;
+
+    @Autowired
+    MyUserDetailsService userDetailsService;
+
+    @Autowired
+    private AuthenticationManager authenticationManager;
+
+    @Autowired
+    private JwtUtils jwtUtils;
 
     @Autowired
     private PasswordEncoder passwordEncoder;
@@ -81,5 +98,17 @@ public class UserServiceImpl implements UserService {
         } catch (Exception exception) {
             throw new UserValidationException("Unable to delete user.");
         }
+    }
+
+    @Override
+    public RecoveryJwtTokenDTO authenticateUser(LoginRequestDTO loginRequestDTO) {
+        UsernamePasswordAuthenticationToken usernamePasswordAuthenticationToken =
+                new UsernamePasswordAuthenticationToken(loginRequestDTO.getEmail(), loginRequestDTO.getPassword());
+
+        Authentication authentication = authenticationManager.authenticate(usernamePasswordAuthenticationToken);
+
+        UserDetails userDetails = (UserDetails) userDetailsService.loadUserByUsername(loginRequestDTO.getEmail());
+
+        return new RecoveryJwtTokenDTO(jwtUtils.generateToken(userDetails));
     }
 }
