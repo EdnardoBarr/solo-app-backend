@@ -1,5 +1,7 @@
 package ednardo.api.soloapp.config;
 
+import ednardo.api.soloapp.filter.UserAuthenticationFilter;
+import ednardo.api.soloapp.model.security.MyUserDetailsService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -14,6 +16,7 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
 import static org.springframework.security.config.Customizer.withDefaults;
 
@@ -21,14 +24,20 @@ import static org.springframework.security.config.Customizer.withDefaults;
 @EnableWebSecurity
 public class SecurityConfig {
     @Autowired
-    private UserDetailsService userDetailsService;
+    private MyUserDetailsService userDetailsService;
+
+    @Autowired
+    private UserAuthenticationFilter userAuthenticationFilter;
 
     public static final String [] ENDPOINTS_WITH_AUTHENTICATION_NOT_REQUIRED = {
-            "/login",
+            "/login/**",
+            "/user/**",
+            "/swagger-ui/**",
+            "/test"
     };
 
     public static final String [] ENDPOINTS_WITH_AUTHENTICATION_REQUIRED = {
-            "/users/test"
+            "/users/test/user"
     };
 
     public static final String [] ENDPOINTS_USER = {
@@ -39,16 +48,23 @@ public class SecurityConfig {
             "/users/test/administrator"
     };
 
-    private static final String[] SWAGGER_WHITELIST = {
+    public static final String[] SWAGGER_WHITELIST = {
             "/swagger-ui/**",
             "/v3/api-docs/**",
             "/swagger-resources/**",
             "/swagger-resources",
-            "/login/**",
+            "/login",
             "/hello/**",
-    //        "/user/**",
+            "/user/login",
+            "/user/test",
+            "/user/update",
+            "/role/create",
+            "/role/1",
+            "/role/delete/",
+            "/user/registration",
+            "/swagger-ui/index.html",
             "/swagger-ui.html",
-//            "/**"
+            "/**"
     };
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
@@ -56,11 +72,22 @@ public class SecurityConfig {
         http
                 .csrf().disable().authorizeHttpRequests(authorize -> authorize
                         .requestMatchers(SWAGGER_WHITELIST).permitAll().anyRequest().authenticated()
+                        .and().addFilterBefore(userAuthenticationFilter, UsernamePasswordAuthenticationFilter.class)
 
                 )
                 .formLogin(withDefaults())
                 .httpBasic(withDefaults());
-        return http.build();
+
+//         http.csrf().disable() // Desativa a proteção contra CSRF
+//                .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS) // Configura a política de criação de sessão como stateless
+//                .and().authorizeHttpRequests() // Habilita a autorização para as requisições HTTP
+//                .requestMatchers(SWAGGER_WHITELIST).permitAll()
+//                .anyRequest().authenticated()
+//                .anyRequest().denyAll()
+//                // Adiciona o filtro de autenticação de usuário que criamos, antes do filtro de segurança padrão do Spring Security
+//                .and().addFilterBefore(userAuthenticationFilter, UsernamePasswordAuthenticationFilter.class)
+//                .getOrBuild();
+        return http.getOrBuild();
     }
 
 //    @Bean

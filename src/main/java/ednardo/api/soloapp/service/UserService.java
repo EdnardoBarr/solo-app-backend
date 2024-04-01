@@ -7,9 +7,8 @@ import ednardo.api.soloapp.model.dto.UserDTO;
 import org.springframework.http.ResponseEntity;
 
 public interface UserService {
-    ResponseEntity registerNewUser(UserDTO userDTO);
-    void update(User user);
+    void registerNewUser(UserDTO userDTO);
+    void update(UserDTO userDTO);
     void deleteByEmail(String email);
     RecoveryJwtTokenDTO authenticateUser(LoginRequestDTO loginRequestDTO);
-
 }

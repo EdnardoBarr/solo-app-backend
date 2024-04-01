@@ -25,14 +25,22 @@ public class UserController {
     }
 
     @PostMapping("/registration")
-    public ResponseEntity<Void> registerUserAccount(@RequestBody @Valid UserDTO userDTO) {
+    public ResponseEntity<String> registerUserAccount(@RequestBody @Valid UserDTO userDTO) {
         userService.registerNewUser(userDTO);
         return new ResponseEntity<>("User created.", HttpStatus.CREATED);
     }
 
+    @PutMapping("/update")
+    public ResponseEntity<String> updateUser(@RequestBody UserDTO userDTO) {
+        userService.update(userDTO);
+        return new ResponseEntity<>("User updated.", HttpStatus.NO_CONTENT);
+    }
+
+    @DeleteMapping("")
+
     @GetMapping("/test")
-    public ResponseEntity<String> getAuthenticationTest() {
-        return new ResponseEntity<>("Authenticated", HttpStatus.OK);
+    public String getAuthenticationTest() {
+        return "OK";
     }
 
     @GetMapping("/test/user")

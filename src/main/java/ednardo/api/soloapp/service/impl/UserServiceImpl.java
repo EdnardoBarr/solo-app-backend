@@ -14,6 +14,7 @@ import ednardo.api.soloapp.repository.UserRepository;
 import ednardo.api.soloapp.service.UserService;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -22,6 +23,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.Collections;
+import java.util.Optional;
 
 @Service
 @Transactional
@@ -42,40 +44,46 @@ public class UserServiceImpl implements UserService {
     private PasswordEncoder passwordEncoder;
 
     @Override
-    public User registerNewUser(final UserDTO userDTO) {
+    public void registerNewUser(final UserDTO userDTO) {
 
         if (userRepository.existsByEmail(userDTO.getEmail())) {
-            throw new UserAlreadyExistsException("This login email already exists.");
+            throw new UserValidationException("This login email already exists.");
         }
 
-        final User user = new User();
+        User newUser = User.builder().email(userDTO.getEmail())
+                .password(passwordEncoder.encode(userDTO.getPassword()))
+                .givenName(userDTO.getGivenName())
+                .surname(userDTO.getSurname())
+                .country(userDTO.getCountry())
+                .city(userDTO.getCity())
+                .dateOfBirth(userDTO.getDateOfBirth())
+                .role(userDTO.getRole())
+                .active(userDTO.isActive())
+                .build();
 
         try {
-            user.setFirstName(userDTO.getFirstName());
-            user.setLastName(userDTO.getLastName());
-            user.setPassword(passwordEncoder.encode(userDTO.getPassword()));
-            user.setEmail(userDTO.getEmail());
-       //     user.setRoles(Collections.singletonList(roleRepository.findByName("ROLE_USER")));
-            user.setActive(true);
-
-            return userRepository.save(user);
+            userRepository.save(newUser);
         } catch (Exception exception) {
             throw new UserValidationException("Unable to save new user. Please try again.");
         }
     }
+
     @Override
-    public void update(User user) {
-        User userUpdated = this.userRepository.findByEmail(user.getEmail());
+    public void update(UserDTO userDTO) {
+        User userUpdated = this.userRepository.findByEmail(userDTO.getEmail());
         if (userUpdated == null) {
-            throw new UserNotFoundException("User not found.");
+            throw new UserValidationException("User not found.");
         }
 
-        userUpdated.setFirstName(user.getFirstName());
-        userUpdated.setLastName(user.getLastName());
-        userUpdated.setActive(user.getActive());
-        userUpdated.setRoles(user.getRoles());
-        userUpdated.setPassword(user.getPassword());
-        userUpdated.setEmail(user.getEmail());
+        userUpdated.setGivenName(userDTO.getGivenName());
+        userUpdated.setSurname(userDTO.getSurname());
+        userUpdated.setCountry(userDTO.getCountry());
+        userUpdated.setCity(userDTO.getCity());
+        userUpdated.setDateOfBirth(userDTO.getDateOfBirth());
+        userUpdated.setRole(userDTO.getRole());
+        userUpdated.setActive(userDTO.isActive());
+        userUpdated.setPassword(passwordEncoder.encode(userDTO.getPassword()));
+        userUpdated.setEmail(userDTO.getEmail());
 
         try {
             this.userRepository.save(userUpdated);

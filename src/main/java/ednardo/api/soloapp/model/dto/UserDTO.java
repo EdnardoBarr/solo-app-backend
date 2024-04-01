@@ -1,74 +1,32 @@
 package ednardo.api.soloapp.model.dto;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import ednardo.api.soloapp.model.Role;
 import ednardo.api.soloapp.validation.PasswordMatches;
 import ednardo.api.soloapp.validation.ValidEmail;
+import jakarta.persistence.Column;
 import jakarta.validation.constraints.NotEmpty;
+import lombok.Data;
 import org.springframework.lang.NonNull;
 
+import java.time.LocalDate;
+import java.util.Collection;
+
 @PasswordMatches
+@Data
 public class UserDTO {
     @ValidEmail
-    @NonNull
-    @NotEmpty
     private String email;
-    @NonNull
-    @NotEmpty
-    private String firstName;
-    @NonNull
-    @NotEmpty
-    private String lastName;
-    @NonNull
-    @NotEmpty
+    private String givenName;
+    private String surname;
+    private String country;
+    private String city;
+    private String dateOfBirth;
     private String password;
-    @NonNull
-    @NotEmpty
     private String matchingPassword;
+    private Collection<Role> role;
+    private boolean active;
 
-
-
-    @NonNull
-    public String getEmail() {
-        return email;
-    }
-
-    public void setEmail(@NonNull String email) {
-        this.email = email;
-    }
-
-    @NonNull
-    public String getFirstName() {
-        return firstName;
-    }
-
-    public void setFirstName(@NonNull String firstName) {
-        this.firstName = firstName;
-    }
-
-    @NonNull
-    public String getLastName() {
-        return lastName;
-    }
-
-    public void setLastName(@NonNull String lastName) {
-        this.lastName = lastName;
-    }
-
-    @NonNull
-    public String getPassword() {
-        return password;
-    }
-
-    public void setPassword(@NonNull String password) {
-        this.password = password;
-    }
-
-    public String getMatchingPassword() {
-        return matchingPassword;
-    }
-
-    public void setMatchingPassword(String matchingPassword) {
-        this.matchingPassword = matchingPassword;
-    }
 
 
 }
