@@ -26,7 +26,4 @@ public class UserDTO {
     private String matchingPassword;
     private Collection<Role> role;
     private boolean active;
-
-
-
 }
