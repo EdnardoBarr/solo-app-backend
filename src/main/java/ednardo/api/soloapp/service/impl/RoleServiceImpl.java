@@ -24,13 +24,13 @@ public class RoleServiceImpl implements RoleService {
 
     @Override
     public void createRole(Role role) {
-        if (roleRepository.existsByNameIgnoreCase(role.getName())) {
-            throw new RoleValidationException("Role already exists.");
-        }
+//        if (roleRepository.existsByRoleNameIgnoreCase(role.getRoleName().toString())) {
+//            throw new RoleValidationException("Role already exists.");
+//        }
 
         try {
-            Role newRole = Role.builder().name(role.getName())
-                .description(role.getDescription())
+            Role newRole = Role.builder().roleName(role.getRoleName())
+             //   .description(role.getDescription())
                 .build();
 
             roleRepository.save(newRole);
@@ -41,14 +41,16 @@ public class RoleServiceImpl implements RoleService {
 
     @Override
     public void updateRole(Role role) {
-        Role roleUpdated = this.roleRepository.findByNameIgnoreCase(role.getName());
-        if (roleUpdated == null) {
-            throw new RoleValidationException("Role not found.");
-        }
+//        Role roleUpdated = this.roleRepository.findByRoleNameIgnoreCase(role.getRoleName().toString());
+//        if (roleUpdated == null) {
+//            throw new RoleValidationException("Role not found.");
+//        }
+
+        Role roleUpdated = new Role();
 
         try {
-            roleUpdated.setName(role.getName());
-            roleUpdated.setDescription(role.getDescription());
+            roleUpdated.setRoleName(role.getRoleName());
+      //      roleUpdated.setDescription(role.getDescription());
 
             this.roleRepository.save(roleUpdated);
         } catch (Exception exception) {

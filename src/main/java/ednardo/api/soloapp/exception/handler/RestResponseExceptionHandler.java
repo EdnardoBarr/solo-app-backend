@@ -6,11 +6,13 @@ import ednardo.api.soloapp.model.dto.FieldErrorDTO;
 import io.micrometer.common.lang.NonNull;
 import org.springframework.core.Ordered;
 import org.springframework.core.annotation.Order;
+import org.springframework.core.convert.ConversionFailedException;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
+import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.validation.BindException;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
@@ -33,14 +35,14 @@ public class RestResponseExceptionHandler extends ResponseEntityExceptionHandler
 
     @ExceptionHandler(value = { IllegalArgumentException.class })
     protected ResponseEntity<Object> handleIllegalArguments(
-            RuntimeException ex, WebRequest webRequest) {
+            IllegalArgumentException ex, WebRequest webRequest) {
         HttpStatus httpStatus = HttpStatus.BAD_REQUEST;
         ErrorDTO errorDTO = ErrorDTO.builder().code(httpStatus.value()).message(ex.getMessage()).build();
         return handleExceptionInternal(ex, errorDTO, new HttpHeaders(), httpStatus, webRequest);
     }
 
     @ExceptionHandler(value = {EmptyResultDataAccessException.class})
-    protected ResponseEntity<Object> handleEmptyResult(RuntimeException ex, WebRequest webRequest) {
+    protected ResponseEntity<Object> handleEmptyResult(EmptyResultDataAccessException ex, WebRequest webRequest) {
         HttpStatus httpStatus = HttpStatus.NOT_FOUND;
         ErrorDTO errorDTO = ErrorDTO.builder().code(httpStatus.value()).message("Entidade não encontrada").build();
         return handleExceptionInternal(ex, errorDTO, new HttpHeaders(), httpStatus, webRequest);
@@ -56,9 +58,28 @@ public class RestResponseExceptionHandler extends ResponseEntityExceptionHandler
     @ExceptionHandler(value = TokenRefreshException.class)
     public ResponseEntity<Object> handleTokenRefreshException(TokenRefreshException ex, WebRequest webRequest) {
         HttpStatus httpStatus = HttpStatus.FORBIDDEN;
+        ErrorDTO errorDTO = ErrorDTO.builder().code(httpStatus.value()).message("AAA").build();
+        return handleExceptionInternal(ex, errorDTO, new HttpHeaders(), httpStatus, webRequest);
+    }
+
+    @ExceptionHandler(value = ConversionFailedException.class)
+    public ResponseEntity<Object> handleConversionFailedException(RuntimeException ex,  WebRequest webRequest) {
+        HttpStatus httpStatus = HttpStatus.BAD_REQUEST;
         ErrorDTO errorDTO = ErrorDTO.builder().code(httpStatus.value()).message(ex.getMessage()).build();
         return handleExceptionInternal(ex, errorDTO, new HttpHeaders(), httpStatus, webRequest);
     }
+
+
+    @Override
+    @NonNull
+    protected ResponseEntity<Object> handleHttpMessageNotReadableException (@NonNull HttpMessageNotReadableException ex,
+                                                                            HttpHeaders httpHeaders, HttpStatusCode httpStatusCode, WebRequest webRequest) {
+        HttpStatus httpStatus = HttpStatus.BAD_REQUEST;
+        ErrorDTO errorDTO = ErrorDTO.builder().message(ex.getMessage()).build();
+//
+        return new ResponseEntity<>(httpStatus);
+    }
+
 
     @Override
     @NonNull

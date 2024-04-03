@@ -1,5 +1,6 @@
 package ednardo.api.soloapp.service.impl;
 
+import ednardo.api.soloapp.enums.RoleName;
 import ednardo.api.soloapp.exception.UserAlreadyExistsException;
 import ednardo.api.soloapp.exception.UserNotFoundException;
 import ednardo.api.soloapp.exception.UserValidationException;
@@ -10,6 +11,7 @@ import ednardo.api.soloapp.model.dto.RecoveryJwtTokenDTO;
 import ednardo.api.soloapp.model.dto.UserDTO;
 import ednardo.api.soloapp.model.security.JwtUtils;
 import ednardo.api.soloapp.model.security.MyUserDetailsService;
+import ednardo.api.soloapp.repository.RoleRepository;
 import ednardo.api.soloapp.repository.UserRepository;
 import ednardo.api.soloapp.service.UserService;
 import jakarta.transaction.Transactional;
@@ -23,6 +25,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.Collections;
+import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -30,6 +33,9 @@ import java.util.Optional;
 public class UserServiceImpl implements UserService {
     @Autowired
     UserRepository userRepository;
+
+    @Autowired
+    RoleRepository roleRepository;
 
     @Autowired
     MyUserDetailsService userDetailsService;
@@ -50,15 +56,22 @@ public class UserServiceImpl implements UserService {
             throw new UserValidationException("This login email already exists.");
         }
 
-        User newUser = User.builder().email(userDTO.getEmail())
+        Role role = roleRepository.findByRoleNameOrDefault(userDTO.getRoleName());
+
+//        if (role == null) {
+//            role = roleRepository.findByRoleName(RoleName.ROLE_DEFAULT);
+//        }
+
+        User newUser = User.builder()
+                .email(userDTO.getEmail())
                 .password(passwordEncoder.encode(userDTO.getPassword()))
                 .givenName(userDTO.getGivenName())
                 .surname(userDTO.getSurname())
                 .country(userDTO.getCountry())
                 .city(userDTO.getCity())
                 .dateOfBirth(userDTO.getDateOfBirth())
-                .role(userDTO.getRole())
                 .active(userDTO.isActive())
+                .roles(List.of(role))
                 .build();
 
         try {
@@ -80,7 +93,7 @@ public class UserServiceImpl implements UserService {
         userUpdated.setCountry(userDTO.getCountry());
         userUpdated.setCity(userDTO.getCity());
         userUpdated.setDateOfBirth(userDTO.getDateOfBirth());
-        userUpdated.setRole(userDTO.getRole());
+      //  userUpdated.setRole(userDTO.getRole());
         userUpdated.setActive(userDTO.isActive());
         userUpdated.setPassword(passwordEncoder.encode(userDTO.getPassword()));
         userUpdated.setEmail(userDTO.getEmail());
