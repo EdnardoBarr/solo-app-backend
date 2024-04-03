@@ -68,7 +68,7 @@ public class SecurityConfig {
     };
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
-       // http.csrf().disable().authorizeRequests().requestMatchers(SWAGGER_WHITELIST).permitAll().anyRequest().authenticated().and().httpBasic();
+    //    http.csrf().disable().authorizeRequests().requestMatchers(SWAGGER_WHITELIST).permitAll().anyRequest().authenticated().and().httpBasic();
         http
                 .csrf().disable().authorizeHttpRequests(authorize -> authorize
                         .requestMatchers(SWAGGER_WHITELIST).permitAll().anyRequest().authenticated()
@@ -83,11 +83,11 @@ public class SecurityConfig {
 //                .and().authorizeHttpRequests() // Habilita a autorização para as requisições HTTP
 //                .requestMatchers(SWAGGER_WHITELIST).permitAll()
 //                .anyRequest().authenticated()
-//                .anyRequest().denyAll()
-//                // Adiciona o filtro de autenticação de usuário que criamos, antes do filtro de segurança padrão do Spring Security
-//                .and().addFilterBefore(userAuthenticationFilter, UsernamePasswordAuthenticationFilter.class)
-//                .getOrBuild();
-        return http.getOrBuild();
+//                .anyRequest().denyAll();
+                // Adiciona o filtro de autenticação de usuário que criamos, antes do filtro de segurança padrão do Spring Security
+               // .and().addFilterBefore(userAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
+
+         return http.getOrBuild();
     }
 
 //    @Bean

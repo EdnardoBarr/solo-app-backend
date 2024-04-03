@@ -13,6 +13,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageNotReadableException;
+import org.springframework.security.authentication.BadCredentialsException;
+import org.springframework.security.core.AuthenticationException;
 import org.springframework.validation.BindException;
 import org.springframework.validation.FieldError;
 import org.springframework.validation.ObjectError;
@@ -22,7 +24,6 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.context.request.WebRequest;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
 
-import javax.naming.AuthenticationException;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -50,9 +51,9 @@ public class RestResponseExceptionHandler extends ResponseEntityExceptionHandler
     }
 
     @ExceptionHandler(value = {AuthenticationException.class})
-    protected ResponseEntity<Object> handleAuthenticatorException(RuntimeException ex, WebRequest webRequest) {
+    protected ResponseEntity<Object> handleAuthenticatorException(AuthenticationException ex, WebRequest webRequest) {
         HttpStatus httpStatus = HttpStatus.UNAUTHORIZED;
-        ErrorDTO errorDTO = ErrorDTO.builder().code(httpStatus.value()).message(ex.getMessage()).build();
+        ErrorDTO errorDTO = ErrorDTO.builder().code(httpStatus.value()).message("Bad Credentials.").build();
         return handleExceptionInternal(ex, errorDTO, new HttpHeaders(), httpStatus, webRequest);
     }
 
@@ -70,15 +71,16 @@ public class RestResponseExceptionHandler extends ResponseEntityExceptionHandler
         return handleExceptionInternal(ex, errorDTO, new HttpHeaders(), httpStatus, webRequest);
     }
 
-
     @Override
     @NonNull
-    protected ResponseEntity<Object> handleHttpMessageNotReadableException (@NonNull HttpMessageNotReadableException ex,
-                                                                            HttpHeaders httpHeaders, HttpStatusCode httpStatusCode, WebRequest webRequest) {
-        HttpStatus httpStatus = HttpStatus.BAD_REQUEST;
+    protected ResponseEntity<Object> handleHttpMessageNotReadable(
+            HttpMessageNotReadableException ex, HttpHeaders headers, HttpStatusCode status, WebRequest request) {
+//    protected ResponseEntity<Object> handleHttpMessageNotReadableException (@NonNull HttpMessageNotReadableException ex,
+//                                                                            HttpHeaders httpHeaders, HttpStatusCode httpStatusCode, WebRequest webRequest) {
+        HttpStatusCode httpStatus = HttpStatus.BAD_REQUEST;
         ErrorDTO errorDTO = ErrorDTO.builder().message(ex.getMessage()).build();
 //
-        return new ResponseEntity<>(httpStatus);
+        return handleExceptionInternal(ex, errorDTO, headers, status, request);
     }
 
 
@@ -95,7 +97,7 @@ public class RestResponseExceptionHandler extends ResponseEntityExceptionHandler
     protected ResponseEntity<Object> handleBindException(
             @NonNull BindException ex, @NonNull HttpHeaders headers,
             @NonNull HttpStatusCode status, @NonNull WebRequest request) {
-        HttpStatus httpStatus = HttpStatus.BAD_REQUEST;
+        HttpStatusCode httpStatus = HttpStatus.BAD_REQUEST;
 
         List<FieldErrorDTO> errorList = ex.getAllErrors().stream().map(objectError ->
                 this.mapErrorToDTO(objectError)

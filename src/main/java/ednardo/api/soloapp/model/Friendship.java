@@ -6,7 +6,6 @@ import jakarta.persistence.*;
 @Entity
 public class Friendship {
     @Id
-
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 

@@ -22,7 +22,6 @@ import java.util.List;
 @Transactional
 public class  MyUserDetailsService implements UserDetailsService {
     private User user;
-
     @Autowired
     private UserRepository userRepository;
 
@@ -43,15 +42,11 @@ public class  MyUserDetailsService implements UserDetailsService {
 
         return new org.springframework.security.core.userdetails.User(user.getEmail(), user.getPassword(), enabled, accountNonExpired, credentialsNonExpired, accountNonLocked, getAuthorities(user.getRoles()));
     }
-
     private static Collection<GrantedAuthority> getAuthorities (Collection<Role> roles) {
         Collection<GrantedAuthority> authorities = new ArrayList<>();
         for (Role role : roles) {
-            authorities.add(new SimpleGrantedAuthority(role.toString()));
+            authorities.add(new SimpleGrantedAuthority(role.getRoleName().toString()));
         }
         return authorities;
     }
-
-
-
 }

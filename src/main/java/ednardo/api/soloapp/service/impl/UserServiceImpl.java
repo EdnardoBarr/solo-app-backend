@@ -20,6 +20,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -56,7 +57,7 @@ public class UserServiceImpl implements UserService {
             throw new UserValidationException("This login email already exists.");
         }
 
-        Role role = roleRepository.findByRoleNameOrDefault(userDTO.getRoleName());
+        Role role = roleRepository.findByRoleNameOrDefaultRoleName(userDTO.getRoleName(), RoleName.ROLE_DEFAULT);
 
 //        if (role == null) {
 //            role = roleRepository.findByRoleName(RoleName.ROLE_DEFAULT);
@@ -70,7 +71,7 @@ public class UserServiceImpl implements UserService {
                 .country(userDTO.getCountry())
                 .city(userDTO.getCity())
                 .dateOfBirth(userDTO.getDateOfBirth())
-                .roles(List.of(Role.builder().roleName(userDTO.getRoleName()).build()))
+               // .roles(List.of(Role.builder().roleName(userDTO.getRoleName()).build()))
                 .active(userDTO.isActive())
                 .roles(List.of(role))
                 .build();
@@ -123,13 +124,13 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public RecoveryJwtTokenDTO authenticateUser(LoginRequestDTO loginRequestDTO) {
-        UsernamePasswordAuthenticationToken usernamePasswordAuthenticationToken =
+            UsernamePasswordAuthenticationToken usernamePasswordAuthenticationToken =
                 new UsernamePasswordAuthenticationToken(loginRequestDTO.getEmail(), loginRequestDTO.getPassword());
 
-        Authentication authentication = authenticationManager.authenticate(usernamePasswordAuthenticationToken);
+            Authentication authentication = authenticationManager.authenticate(usernamePasswordAuthenticationToken);
 
-        UserDetails userDetails = (UserDetails) userDetailsService.loadUserByUsername(loginRequestDTO.getEmail());
+            UserDetails userDetails = (UserDetails) userDetailsService.loadUserByUsername(loginRequestDTO.getEmail());
 
-        return new RecoveryJwtTokenDTO(jwtUtils.generateToken(userDetails));
+            return new RecoveryJwtTokenDTO(jwtUtils.generateToken(userDetails));
     }
 }

@@ -33,7 +33,8 @@ public class User {
     private String city;
     @Column(name = "date_of_birth")
     private String dateOfBirth;
-    @JsonIgnore
+    private String pictureLocation;
+    private String bio;
     private boolean active;
 
     @ManyToMany(fetch = FetchType.EAGER, cascade = CascadeType.PERSIST)
@@ -41,4 +42,10 @@ public class User {
             joinColumns = @JoinColumn(name = "user_id", referencedColumnName = "id"),
             inverseJoinColumns = @JoinColumn(name="role_id", referencedColumnName = "id"))
     private List<Role> roles;
+
+    @ManyToMany(fetch = FetchType.EAGER, cascade = CascadeType.PERSIST)
+    @JoinTable(name = "friendship",
+     joinColumns = @JoinColumn(name = "user_id", referencedColumnName = "id"),
+     inverseJoinColumns = @JoinColumn(name = "friend_id", referencedColumnName = "id"))
+    private List<Friendship> friends;
 }
