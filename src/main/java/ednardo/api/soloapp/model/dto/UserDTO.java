@@ -1,6 +1,7 @@
 package ednardo.api.soloapp.model.dto;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import ednardo.api.soloapp.enums.RoleName;
 import ednardo.api.soloapp.model.Role;
 import ednardo.api.soloapp.validation.PasswordMatches;
 import ednardo.api.soloapp.validation.ValidEmail;
@@ -11,6 +12,7 @@ import org.springframework.lang.NonNull;
 
 import java.time.LocalDate;
 import java.util.Collection;
+import java.util.List;
 
 @PasswordMatches
 @Data
@@ -24,6 +26,6 @@ public class UserDTO {
     private String dateOfBirth;
     private String password;
     private String matchingPassword;
-    private Collection<Role> role;
+    private RoleName role;
     private boolean active;
 }

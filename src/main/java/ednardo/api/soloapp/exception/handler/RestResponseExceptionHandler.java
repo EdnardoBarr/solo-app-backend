@@ -13,6 +13,7 @@ import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindException;
 import org.springframework.validation.FieldError;
+import org.springframework.validation.ObjectError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
@@ -76,13 +77,19 @@ public class RestResponseExceptionHandler extends ResponseEntityExceptionHandler
         HttpStatus httpStatus = HttpStatus.BAD_REQUEST;
 
         List<FieldErrorDTO> errorList = ex.getAllErrors().stream().map(objectError ->
-                new FieldErrorDTO(((FieldError)objectError).getField(), objectError.getDefaultMessage())
+                this.mapErrorToDTO(objectError)
         ).collect(Collectors.toList());
 
         ErrorDTO dto = ErrorDTO.builder().code(httpStatus.value()).message("Argumentos inválidos na requisição").
                 errors(errorList).build();
-
         return ResponseEntity.badRequest().body(dto);
+    }
+
+    private FieldErrorDTO mapErrorToDTO(ObjectError objectError) {
+        if (objectError instanceof FieldError)
+            return new FieldErrorDTO(((FieldError)objectError).getField(), objectError.getDefaultMessage());
+        else
+            return new FieldErrorDTO(null, objectError.getDefaultMessage());
     }
 
 }

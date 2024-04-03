@@ -10,6 +10,7 @@ import ednardo.api.soloapp.model.dto.RecoveryJwtTokenDTO;
 import ednardo.api.soloapp.model.dto.UserDTO;
 import ednardo.api.soloapp.model.security.JwtUtils;
 import ednardo.api.soloapp.model.security.MyUserDetailsService;
+import ednardo.api.soloapp.repository.RoleRepository;
 import ednardo.api.soloapp.repository.UserRepository;
 import ednardo.api.soloapp.service.UserService;
 import jakarta.transaction.Transactional;
@@ -23,6 +24,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.Collections;
+import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -30,6 +32,9 @@ import java.util.Optional;
 public class UserServiceImpl implements UserService {
     @Autowired
     UserRepository userRepository;
+
+    @Autowired
+    RoleRepository roleRepository;
 
     @Autowired
     MyUserDetailsService userDetailsService;
@@ -57,10 +62,9 @@ public class UserServiceImpl implements UserService {
                 .country(userDTO.getCountry())
                 .city(userDTO.getCity())
                 .dateOfBirth(userDTO.getDateOfBirth())
-                .role(userDTO.getRole())
+                .roles(List.of(Role.builder().name(userDTO.getRole()).build()))
                 .active(userDTO.isActive())
                 .build();
-
         try {
             userRepository.save(newUser);
         } catch (Exception exception) {
@@ -80,7 +84,7 @@ public class UserServiceImpl implements UserService {
         userUpdated.setCountry(userDTO.getCountry());
         userUpdated.setCity(userDTO.getCity());
         userUpdated.setDateOfBirth(userDTO.getDateOfBirth());
-        userUpdated.setRole(userDTO.getRole());
+   //     userUpdated.setRoles(userDTO.getRoles());
         userUpdated.setActive(userDTO.isActive());
         userUpdated.setPassword(passwordEncoder.encode(userDTO.getPassword()));
         userUpdated.setEmail(userDTO.getEmail());

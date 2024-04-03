@@ -1,5 +1,6 @@
 package ednardo.api.soloapp.model;
 
+import ednardo.api.soloapp.enums.RoleName;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -18,7 +19,8 @@ public class Role {
     @Column(name = "role_id")
     private Long id;
 
-    private String name;
+    @Enumerated(EnumType.STRING)
+    private RoleName name;
 
     private String description;
 
