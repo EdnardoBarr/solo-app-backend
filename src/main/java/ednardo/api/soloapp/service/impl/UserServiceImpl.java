@@ -1,5 +1,6 @@
 package ednardo.api.soloapp.service.impl;
 
+import ednardo.api.soloapp.enums.RoleName;
 import ednardo.api.soloapp.exception.UserAlreadyExistsException;
 import ednardo.api.soloapp.exception.UserNotFoundException;
 import ednardo.api.soloapp.exception.UserValidationException;
@@ -55,15 +56,23 @@ public class UserServiceImpl implements UserService {
             throw new UserValidationException("This login email already exists.");
         }
 
-        User newUser = User.builder().email(userDTO.getEmail())
+        Role role = roleRepository.findByRoleNameOrDefault(userDTO.getRoleName());
+
+//        if (role == null) {
+//            role = roleRepository.findByRoleName(RoleName.ROLE_DEFAULT);
+//        }
+
+        User newUser = User.builder()
+                .email(userDTO.getEmail())
                 .password(passwordEncoder.encode(userDTO.getPassword()))
                 .givenName(userDTO.getGivenName())
                 .surname(userDTO.getSurname())
                 .country(userDTO.getCountry())
                 .city(userDTO.getCity())
                 .dateOfBirth(userDTO.getDateOfBirth())
-                .roles(List.of(Role.builder().name(userDTO.getRole()).build()))
+                .roles(List.of(Role.builder().roleName(userDTO.getRoleName()).build()))
                 .active(userDTO.isActive())
+                .roles(List.of(role))
                 .build();
         try {
             userRepository.save(newUser);
@@ -84,7 +93,7 @@ public class UserServiceImpl implements UserService {
         userUpdated.setCountry(userDTO.getCountry());
         userUpdated.setCity(userDTO.getCity());
         userUpdated.setDateOfBirth(userDTO.getDateOfBirth());
-   //     userUpdated.setRoles(userDTO.getRoles());
+      //  userUpdated.setRole(userDTO.getRole());
         userUpdated.setActive(userDTO.isActive());
         userUpdated.setPassword(passwordEncoder.encode(userDTO.getPassword()));
         userUpdated.setEmail(userDTO.getEmail());

@@ -8,6 +8,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.util.Collection;
+import java.util.List;
 
 @Entity
 @Table(name="roles")
@@ -16,15 +17,15 @@ public class Role {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "role_id")
     private Long id;
 
+    @Column(name = "role_name")
     @Enumerated(EnumType.STRING)
-    private RoleName name;
+    private RoleName roleName;
 
-    private String description;
+//    public Role(String role_default) {
+//    }
 
-    @ManyToMany(mappedBy = "role")
-    private Collection<User> users;
-
+//    @ManyToMany(mappedBy = "roles")
+//    private List<User> users;
 }

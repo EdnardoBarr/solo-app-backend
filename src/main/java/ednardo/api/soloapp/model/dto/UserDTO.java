@@ -26,6 +26,6 @@ public class UserDTO {
     private String dateOfBirth;
     private String password;
     private String matchingPassword;
-    private RoleName role;
+    private RoleName roleName;
     private boolean active;
 }
