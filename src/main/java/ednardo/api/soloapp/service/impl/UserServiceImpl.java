@@ -59,10 +59,6 @@ public class UserServiceImpl implements UserService {
 
         Role role = roleRepository.findByRoleNameOrDefaultRoleName(userDTO.getRoleName(), RoleName.ROLE_DEFAULT);
 
-//        if (role == null) {
-//            role = roleRepository.findByRoleName(RoleName.ROLE_DEFAULT);
-//        }
-
         User newUser = User.builder()
                 .email(userDTO.getEmail())
                 .password(passwordEncoder.encode(userDTO.getPassword()))
@@ -97,7 +93,7 @@ public class UserServiceImpl implements UserService {
       //  userUpdated.setRole(userDTO.getRole());
         userUpdated.setActive(userDTO.isActive());
         userUpdated.setPassword(passwordEncoder.encode(userDTO.getPassword()));
-        userUpdated.setEmail(userDTO.getEmail());
+       // userUpdated.setEmail(userDTO.getEmail());
 
         try {
             this.userRepository.save(userUpdated);

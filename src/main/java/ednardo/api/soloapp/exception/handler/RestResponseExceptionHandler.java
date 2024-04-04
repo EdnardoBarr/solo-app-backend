@@ -46,7 +46,7 @@ public class RestResponseExceptionHandler extends ResponseEntityExceptionHandler
     @ExceptionHandler(value = {EmptyResultDataAccessException.class})
     protected ResponseEntity<Object> handleEmptyResult(EmptyResultDataAccessException ex, WebRequest webRequest) {
         HttpStatus httpStatus = HttpStatus.NOT_FOUND;
-        ErrorDTO errorDTO = ErrorDTO.builder().code(httpStatus.value()).message("Entidade não encontrada").build();
+        ErrorDTO errorDTO = ErrorDTO.builder().code(httpStatus.value()).message("Entity not found.").build();
         return handleExceptionInternal(ex, errorDTO, new HttpHeaders(), httpStatus, webRequest);
     }
 
@@ -60,7 +60,7 @@ public class RestResponseExceptionHandler extends ResponseEntityExceptionHandler
     @ExceptionHandler(value = TokenRefreshException.class)
     public ResponseEntity<Object> handleTokenRefreshException(TokenRefreshException ex, WebRequest webRequest) {
         HttpStatus httpStatus = HttpStatus.FORBIDDEN;
-        ErrorDTO errorDTO = ErrorDTO.builder().code(httpStatus.value()).message("AAA").build();
+        ErrorDTO errorDTO = ErrorDTO.builder().code(httpStatus.value()).message(ex.getMessage()).build();
         return handleExceptionInternal(ex, errorDTO, new HttpHeaders(), httpStatus, webRequest);
     }
 
@@ -75,11 +75,8 @@ public class RestResponseExceptionHandler extends ResponseEntityExceptionHandler
     @NonNull
     protected ResponseEntity<Object> handleHttpMessageNotReadable(
             HttpMessageNotReadableException ex, HttpHeaders headers, HttpStatusCode status, WebRequest request) {
-//    protected ResponseEntity<Object> handleHttpMessageNotReadableException (@NonNull HttpMessageNotReadableException ex,
-//                                                                            HttpHeaders httpHeaders, HttpStatusCode httpStatusCode, WebRequest webRequest) {
         HttpStatusCode httpStatus = HttpStatus.BAD_REQUEST;
         ErrorDTO errorDTO = ErrorDTO.builder().message(ex.getMessage()).build();
-//
         return handleExceptionInternal(ex, errorDTO, headers, status, request);
     }
 
@@ -103,7 +100,7 @@ public class RestResponseExceptionHandler extends ResponseEntityExceptionHandler
                 this.mapErrorToDTO(objectError)
         ).collect(Collectors.toList());
 
-        ErrorDTO dto = ErrorDTO.builder().code(httpStatus.value()).message("Argumentos inválidos na requisição").
+        ErrorDTO dto = ErrorDTO.builder().code(httpStatus.value()).message("Invalid arguments.").
                 errors(errorList).build();
         return ResponseEntity.badRequest().body(dto);
     }

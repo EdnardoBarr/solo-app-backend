@@ -9,7 +9,7 @@ import org.springframework.data.repository.query.Param;
 import java.util.List;
 import java.util.Optional;
 
-public interface RoleRepository extends JpaRepository<Role, Long>, CustomRoleRepository {
+public interface RoleRepository extends JpaRepository<Role, Long> {
  //   List<Role> findAllByRoleNameIgnoreCase(RoleName name);
  //   boolean existsByRoleNameIgnoreCase(RoleName name);
     Optional<Role> findByRoleName(RoleName name);
