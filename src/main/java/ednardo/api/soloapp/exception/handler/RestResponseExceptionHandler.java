@@ -71,6 +71,15 @@ public class RestResponseExceptionHandler extends ResponseEntityExceptionHandler
         return handleExceptionInternal(ex, errorDTO, new HttpHeaders(), httpStatus, webRequest);
     }
 
+    @ExceptionHandler(value = NullPointerException.class)
+    public ResponseEntity<Object> handleNullPointerException(NullPointerException ex, WebRequest request) {
+        HttpStatusCode httpStatus = HttpStatus.INTERNAL_SERVER_ERROR;
+        ErrorDTO errorDTO = ErrorDTO.builder().message("An unexpected error has occured.").build();
+
+        return handleExceptionInternal(ex, errorDTO, new HttpHeaders(), httpStatus, request);
+    }
+
+
     @Override
     @NonNull
     protected ResponseEntity<Object> handleHttpMessageNotReadable(

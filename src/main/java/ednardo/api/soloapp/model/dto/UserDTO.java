@@ -28,4 +28,6 @@ public class UserDTO {
     private String matchingPassword;
     private RoleName roleName;
     private boolean active;
+    private String pictureLocation;
+    private String bio;
 }

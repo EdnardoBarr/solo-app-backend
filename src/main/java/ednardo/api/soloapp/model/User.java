@@ -25,6 +25,7 @@ public class User {
     private Long id;
     @Column(unique = true)
     private String email;
+    @JsonIgnore
     private String password;
     @Column(name = "given_name")
     private String givenName;
@@ -33,6 +34,7 @@ public class User {
     private String city;
     @Column(name = "date_of_birth")
     private String dateOfBirth;
+    @Column(name = "picture_location")
     private String pictureLocation;
     private String bio;
     private boolean active;

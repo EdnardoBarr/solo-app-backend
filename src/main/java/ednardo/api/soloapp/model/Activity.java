@@ -1,5 +1,6 @@
 package ednardo.api.soloapp.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -19,6 +20,7 @@ public class Activity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+    @JsonIgnore
     @ManyToOne
     @JoinColumn(name = "user_id")
     private User owner;
@@ -33,7 +35,7 @@ public class Activity {
     private int maxParticipants;
     private String category;
     @Column(name = "starts_at")
-    private LocalTime startsAt;
+    private LocalDateTime startsAt;
     @Column(name = "finishes_at")
     private LocalDateTime finishesAt;
     @Column(name = "created_at")
