@@ -1,13 +1,9 @@
 package ednardo.api.soloapp.service.impl;
 
 import ednardo.api.soloapp.exception.ActivityValidationException;
-import ednardo.api.soloapp.exception.UserValidationException;
 import ednardo.api.soloapp.model.Activity;
-import ednardo.api.soloapp.model.LocationActivity;
-import ednardo.api.soloapp.model.User;
 import ednardo.api.soloapp.repository.ActivityRepository;
 import ednardo.api.soloapp.service.ActivityService;
-import ednardo.api.soloapp.service.LocationActivityService;
 import ednardo.api.soloapp.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -21,9 +17,6 @@ public class ActivityServiceImpl implements ActivityService {
 
     @Autowired
     ActivityRepository activityRepository;
-
-    @Autowired
-    LocationActivityService locationActivityService;
 
     @Override
     public Optional<Activity> getById(Long id){

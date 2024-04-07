@@ -4,7 +4,7 @@ import ednardo.api.soloapp.enums.FriendshipStatus;
 import jakarta.persistence.*;
 
 @Entity
-@Table(name = "friendships")
+@Table(name = "friendship")
 public class Friendship {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

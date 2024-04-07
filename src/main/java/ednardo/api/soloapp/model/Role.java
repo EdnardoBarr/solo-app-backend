@@ -11,7 +11,7 @@ import java.util.Collection;
 import java.util.List;
 
 @Entity
-@Table(name="roles")
+@Table(name="role")
 @Data @AllArgsConstructor @NoArgsConstructor @Builder
 public class Role {
 

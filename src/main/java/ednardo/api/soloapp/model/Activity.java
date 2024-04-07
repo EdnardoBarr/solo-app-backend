@@ -9,9 +9,10 @@ import lombok.NoArgsConstructor;
 
 import java.time.LocalDateTime;
 import java.time.LocalTime;
+import java.util.List;
 
 @Entity
-@Table(name = "activities")
+@Table(name = "activity")
 @Data
 @Builder
 @AllArgsConstructor
@@ -42,5 +43,7 @@ public class Activity {
     private LocalDateTime createdAt;
     private Boolean active;
 
-
+    @JsonIgnore
+    @OneToMany(fetch = FetchType.LAZY, mappedBy = "activity", cascade = CascadeType.ALL)
+    private List<ActivityMember> member;
 }
