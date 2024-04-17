@@ -1,5 +1,6 @@
 package ednardo.api.soloapp.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import ednardo.api.soloapp.enums.ActivityMemberPrivilege;
 import ednardo.api.soloapp.enums.ActivityStatus;
 import jakarta.persistence.*;
@@ -20,9 +21,11 @@ public class ActivityMember {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+    @JsonIgnore
     @ManyToOne
     @JoinColumn(name = "user_id")
-    private User user;
+    private User member;
+    @JsonIgnore
     @ManyToOne
     @JoinColumn(name = "activity_id")
     private Activity activity;

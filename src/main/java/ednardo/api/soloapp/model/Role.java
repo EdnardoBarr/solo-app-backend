@@ -26,6 +26,6 @@ public class Role {
 //    public Role(String role_default) {
 //    }
 
-//    @ManyToMany(mappedBy = "roles")
-//    private List<User> users;
+    @ManyToMany(mappedBy = "roles")
+    private List<User> users;
 }

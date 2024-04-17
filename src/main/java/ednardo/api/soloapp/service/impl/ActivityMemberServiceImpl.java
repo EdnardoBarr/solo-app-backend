@@ -8,14 +8,15 @@ import ednardo.api.soloapp.model.Activity;
 import ednardo.api.soloapp.model.ActivityMember;
 import ednardo.api.soloapp.model.User;
 import ednardo.api.soloapp.repository.ActivityMemberRepository;
-import ednardo.api.soloapp.repository.ActivityRepository;
 import ednardo.api.soloapp.service.ActivityMemberService;
 import ednardo.api.soloapp.service.ActivityService;
 import ednardo.api.soloapp.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
 
+@Service
 public class ActivityMemberServiceImpl implements ActivityMemberService {
     @Autowired
     ActivityService activityService;
@@ -34,14 +35,14 @@ public class ActivityMemberServiceImpl implements ActivityMemberService {
     @Override
     public ActivityMember requestToJoin (ActivityMember activityMember) {
        Activity activity = activityService.getById(activityMember.getActivity().getId()).orElseThrow(()-> new ActivityValidationException("Activity not found"));
-       User user = userService.getById(activityMember.getUser().getId());
+       User user = userService.getById(activityMember.getMember().getId());
 
        if (activity.getOwner().getId() ==  user.getId()) {
            throw new ActivityValidationException("User is the owner of the activity");
        }
 
        ActivityMember newActivityMember = ActivityMember.builder()
-               .user(user)
+               .member(user)
                .activity(activity)
                .status(ActivityStatus.MEMBER_PENDING)
                .privilege(ActivityMemberPrivilege.PRIVILEGE_DEFAULT)

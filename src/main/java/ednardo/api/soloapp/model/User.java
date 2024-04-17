@@ -8,14 +8,12 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.time.LocalDate;
-import java.util.Collection;
 import java.util.List;
 
 @Entity
 @Data
 @Builder
-@Table(name = "user")
+@Table(name = "user_account")
 @NoArgsConstructor
 @AllArgsConstructor
 public class User {
@@ -49,12 +47,12 @@ public class User {
     private List<Activity> activities;
 
     @JsonIgnore
-    @OneToMany(fetch = FetchType.LAZY, mappedBy = "user", cascade = CascadeType.ALL)
+    @OneToMany(fetch = FetchType.LAZY, mappedBy = "member", cascade = CascadeType.ALL)
     private List<ActivityMember> activityMembers;
+//
+//    @OneToMany(mappedBy = "to")
+//    private List<Friendship> friends;
 
-    @ManyToMany(fetch = FetchType.EAGER, cascade = CascadeType.PERSIST)
-    @JoinTable(name = "friendship",
-     joinColumns = @JoinColumn(name = "user_id", referencedColumnName = "id"),
-     inverseJoinColumns = @JoinColumn(name = "friend_id", referencedColumnName = "id"))
-    private List<Friendship> friends;
+//    @OneToMany(mappedBy = "from")
+//    private List<Friendship> following;
 }
