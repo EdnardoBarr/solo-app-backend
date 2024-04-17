@@ -18,6 +18,11 @@ public class UserController {
     @Autowired
     UserService userService;
 
+    @GetMapping("/{id}")
+    public ResponseEntity getUserById(@PathVariable Long id) {
+        return ResponseEntity.ok(userService.getById(id));
+    }
+
     @PostMapping("/login")
     public ResponseEntity<RecoveryJwtTokenDTO> authenticateUser(@RequestBody LoginRequestDTO loginRequestDTO) {
         RecoveryJwtTokenDTO token = userService.authenticateUser(loginRequestDTO);

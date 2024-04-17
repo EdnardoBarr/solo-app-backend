@@ -51,6 +51,11 @@ public class UserServiceImpl implements UserService {
     private PasswordEncoder passwordEncoder;
 
     @Override
+    public User getById(Long id) {
+        return userRepository.findById(id).orElseThrow(() -> new UserNotFoundException("User not found"));
+    }
+
+    @Override
     public void registerNewUser(final UserDTO userDTO) {
 
         if (userRepository.existsByEmail(userDTO.getEmail())) {
@@ -70,6 +75,8 @@ public class UserServiceImpl implements UserService {
                // .roles(List.of(Role.builder().roleName(userDTO.getRoleName()).build()))
                 .active(userDTO.isActive())
                 .roles(List.of(role))
+                .pictureLocation(userDTO.getPictureLocation())
+                .bio(userDTO.getBio())
                 .build();
         try {
             userRepository.save(newUser);

@@ -11,7 +11,7 @@ import java.util.Collection;
 import java.util.List;
 
 @Entity
-@Table(name="roles")
+@Table(name="role")
 @Data @AllArgsConstructor @NoArgsConstructor @Builder
 public class Role {
 
@@ -26,6 +26,6 @@ public class Role {
 //    public Role(String role_default) {
 //    }
 
-//    @ManyToMany(mappedBy = "roles")
-//    private List<User> users;
+    @ManyToMany(mappedBy = "roles")
+    private List<User> users;
 }

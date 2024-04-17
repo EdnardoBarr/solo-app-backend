@@ -1,8 +1,13 @@
 package ednardo.api.soloapp.service;
 
-import org.springframework.stereotype.Service;
+import ednardo.api.soloapp.model.Friendship;
+import ednardo.api.soloapp.model.User;
 
-@Service
-public class FriendshipService {
+import java.util.Optional;
 
+public interface FriendshipService {
+    Friendship requestFriendship(User userFrom, User userTo);
+    Optional<Friendship> findFriendship(Long fromId, Long toId);
+    void updateFriendship(Long id, Friendship friendship);
+    Optional<Friendship> getById(Long id);
 }

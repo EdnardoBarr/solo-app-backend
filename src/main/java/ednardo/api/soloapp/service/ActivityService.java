@@ -8,6 +8,6 @@ public interface ActivityService {
     Optional<Activity> getById(Long id);
     Activity create(Activity activity);
     void update(Long id, Activity activity);
-//    void deleteById(Long id);
+    void deleteById(Long id);
 
 }

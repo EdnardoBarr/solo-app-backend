@@ -8,14 +8,12 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.time.LocalDate;
-import java.util.Collection;
 import java.util.List;
 
 @Entity
 @Data
 @Builder
-@Table(name = "users")
+@Table(name = "user_account")
 @NoArgsConstructor
 @AllArgsConstructor
 public class User {
@@ -25,6 +23,7 @@ public class User {
     private Long id;
     @Column(unique = true)
     private String email;
+    @JsonIgnore
     private String password;
     @Column(name = "given_name")
     private String givenName;
@@ -33,12 +32,13 @@ public class User {
     private String city;
     @Column(name = "date_of_birth")
     private String dateOfBirth;
+    @Column(name = "picture_location")
     private String pictureLocation;
     private String bio;
     private boolean active;
 
     @ManyToMany(fetch = FetchType.EAGER, cascade = CascadeType.PERSIST)
-    @JoinTable(name="users_roles",
+    @JoinTable(name="user_role",
             joinColumns = @JoinColumn(name = "user_id", referencedColumnName = "id"),
             inverseJoinColumns = @JoinColumn(name="role_id", referencedColumnName = "id"))
     private List<Role> roles;
@@ -46,9 +46,13 @@ public class User {
     @OneToMany(fetch = FetchType.LAZY, mappedBy = "owner", cascade = CascadeType.ALL)
     private List<Activity> activities;
 
-    @ManyToMany(fetch = FetchType.EAGER, cascade = CascadeType.PERSIST)
-    @JoinTable(name = "friendship",
-     joinColumns = @JoinColumn(name = "user_id", referencedColumnName = "id"),
-     inverseJoinColumns = @JoinColumn(name = "friend_id", referencedColumnName = "id"))
-    private List<Friendship> friends;
+    @JsonIgnore
+    @OneToMany(fetch = FetchType.LAZY, mappedBy = "member", cascade = CascadeType.ALL)
+    private List<ActivityMember> activityMembers;
+//
+//    @OneToMany(mappedBy = "to")
+//    private List<Friendship> friends;
+
+//    @OneToMany(mappedBy = "from")
+//    private List<Friendship> following;
 }

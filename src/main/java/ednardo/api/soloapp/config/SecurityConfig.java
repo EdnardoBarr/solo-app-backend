@@ -64,6 +64,9 @@ public class SecurityConfig {
             "/user/registration",
             "/swagger-ui/index.html",
             "/swagger-ui.html",
+            "/activity/register",
+            "/activity/update/1",
+            "/activity/1",
             "/**"
     };
     @Bean

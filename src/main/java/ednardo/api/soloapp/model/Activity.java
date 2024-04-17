@@ -1,5 +1,6 @@
 package ednardo.api.soloapp.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -8,9 +9,10 @@ import lombok.NoArgsConstructor;
 
 import java.time.LocalDateTime;
 import java.time.LocalTime;
+import java.util.List;
 
 @Entity
-@Table(name = "activities")
+@Table(name = "activity")
 @Data
 @Builder
 @AllArgsConstructor
@@ -19,6 +21,7 @@ public class Activity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+    @JsonIgnore
     @ManyToOne
     @JoinColumn(name = "user_id")
     private User owner;
@@ -33,12 +36,14 @@ public class Activity {
     private int maxParticipants;
     private String category;
     @Column(name = "starts_at")
-    private LocalTime startsAt;
+    private LocalDateTime startsAt;
     @Column(name = "finishes_at")
     private LocalDateTime finishesAt;
     @Column(name = "created_at")
     private LocalDateTime createdAt;
     private Boolean active;
 
-
+    @JsonIgnore
+    @OneToMany(fetch = FetchType.LAZY, mappedBy = "activity", cascade = CascadeType.ALL)
+    private List<ActivityMember> member;
 }

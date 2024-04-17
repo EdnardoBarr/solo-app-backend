@@ -1,6 +1,8 @@
 package ednardo.api.soloapp.model;
 
-import ednardo.api.soloapp.enums.FriendshipStatus;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import ednardo.api.soloapp.enums.ActivityMemberPrivilege;
+import ednardo.api.soloapp.enums.ActivityStatus;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -10,30 +12,27 @@ import lombok.NoArgsConstructor;
 import java.time.LocalDateTime;
 
 @Entity
-@Table(name = "friendship")
+@Table(name = "activity_member")
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
-public class Friendship {
+public class ActivityMember {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-
+    @JsonIgnore
     @ManyToOne
-    @JoinColumn(name = "from_id")
-    private User from;
+    @JoinColumn(name = "user_id")
+    private User member;
+    @JsonIgnore
     @ManyToOne
-    @JoinColumn(name = "to_id")
-    private User to;
-
+    @JoinColumn(name = "activity_id")
+    private Activity activity;
     @Enumerated(EnumType.STRING)
-    private FriendshipStatus status;
-
-    @Column(name = "created_at")
+    private ActivityStatus status;
+    private ActivityMemberPrivilege privilege;
     private LocalDateTime createdAt;
-
-    @Column(name = "updated_at")
     private LocalDateTime updatedAt;
 
 }

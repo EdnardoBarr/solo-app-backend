@@ -1,5 +1,6 @@
 package ednardo.api.soloapp.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -7,7 +8,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 @Entity
-@Table(name = "location_activities")
+@Table(name = "location_activity")
 @Data
 @Builder
 @AllArgsConstructor
@@ -16,6 +17,7 @@ public class LocationActivity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+    @JsonIgnore
     @OneToOne(mappedBy = "location")
     private Activity activity;
     private String country;
