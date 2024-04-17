@@ -8,4 +8,6 @@ import java.util.Optional;
 public interface FriendshipService {
     Friendship requestFriendship(User userFrom, User userTo);
     Optional<Friendship> findFriendship(Long fromId, Long toId);
+    void updateFriendship(Long id, Friendship friendship);
+    Optional<Friendship> getById(Long id);
 }
