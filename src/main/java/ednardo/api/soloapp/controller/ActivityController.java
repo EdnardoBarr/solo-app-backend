@@ -1,6 +1,3 @@
-<<<<<<< HEAD
-package ednardo.api.soloapp.controller;public class ActivityController {
-=======
 package ednardo.api.soloapp.controller;
 
 import ednardo.api.soloapp.exception.ActivityValidationException;
@@ -45,5 +42,4 @@ public class ActivityController {
 
         return new ResponseEntity<>("Activiti deleted", HttpStatus.NO_CONTENT);
     }
->>>>>>> 34ca5c215fa3611ac72f12f4c0f4727c406e411d
 }

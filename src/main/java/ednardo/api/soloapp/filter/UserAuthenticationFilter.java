@@ -64,7 +64,7 @@ public class UserAuthenticationFilter extends OncePerRequestFilter {
     private boolean checkIfEndpointIsNotPublic(HttpServletRequest request) {
         String requestURI = request.getRequestURI();
         System.out.println("REQUESTURI" + requestURI);
-        return !Arrays.asList(SecurityConfig.SWAGGER_WHITELIST).contains(requestURI);
+        return Arrays.asList(SecurityConfig.SWAGGER_WHITELIST).stream().noneMatch(uri -> requestURI.contains(uri));
     }
 
 

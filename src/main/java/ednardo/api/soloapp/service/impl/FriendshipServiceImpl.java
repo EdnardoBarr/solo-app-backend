@@ -1,8 +1,7 @@
 package ednardo.api.soloapp.service.impl;
 
 import ednardo.api.soloapp.enums.FriendshipStatus;
-import ednardo.api.soloapp.exception.ActivityValidationException;
-import ednardo.api.soloapp.model.Activity;
+
 import ednardo.api.soloapp.model.Friendship;
 import ednardo.api.soloapp.model.User;
 import ednardo.api.soloapp.repository.FriendshipRepository;
@@ -54,6 +53,8 @@ public class FriendshipServiceImpl implements FriendshipService {
                 case FRIENDSHIP_DECLINED:
                 case FRIENDSHIP_REMOVED:
                     Friendship friendship = existingFriendship.get();
+                    friendship.setFrom(userFrom);
+                    friendship.setTo(userTo);
                     friendship.setStatus(FriendshipStatus.FRIENDSHIP_PENDING);
                     friendship.setUpdatedAt(LocalDateTime.now());
                     return friendshipRepository.save(friendship);
@@ -75,7 +76,7 @@ public class FriendshipServiceImpl implements FriendshipService {
     @Override
     @Transactional
     public void updateFriendship (Long id, Friendship friendship) {
-        Friendship existingFriendship = friendshipRepository.findById(id).orElseThrow(() -> new IllegalArgumentException("Activity not found"));
+        Friendship existingFriendship = friendshipRepository.findById(id).orElseThrow(() -> new IllegalArgumentException("Friendship not found"));
 
         existingFriendship.setStatus(friendship.getStatus());
         existingFriendship.setUpdatedAt(LocalDateTime.now());
