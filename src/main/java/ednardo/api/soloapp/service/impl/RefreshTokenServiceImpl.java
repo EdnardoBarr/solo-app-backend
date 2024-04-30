@@ -1,5 +1,6 @@
 package ednardo.api.soloapp.service.impl;
 
+import ednardo.api.soloapp.exception.JWTException;
 import ednardo.api.soloapp.exception.TokenRefreshException;
 import ednardo.api.soloapp.model.RefreshToken;
 import ednardo.api.soloapp.model.dto.RefreshTokenResponseDTO;
@@ -34,9 +35,13 @@ public class RefreshTokenServiceImpl implements RefreshTokenService {
     public RefreshTokenResponseDTO refreshToken(String requestRefreshToken) {
         return this.findByToken(requestRefreshToken)
                 .map(this::verifyExpiration)
-                .map(RefreshToken::getUser)
-                .map(user -> {
-                    String token = jwtUtils.generateToken(userDetailsService.loadUserByUsername(user.getEmail()));
+                .map(refreshToken -> {
+                    String email = refreshToken.getUser().getEmail();
+                    String token = jwtUtils.generateToken(userDetailsService.loadUserByUsername(email));
+
+                    refreshToken.setExpirationDate(LocalDateTime.now().plusSeconds(refreshTokenDurationSec));
+                    refreshToken.setToken(UUID.randomUUID().toString());
+                    this.tokenRepository.save(refreshToken);
                     return new RefreshTokenResponseDTO(token, requestRefreshToken);
                 })
                 .orElseThrow(() -> new TokenRefreshException(requestRefreshToken, "Token for update not found"));
@@ -61,10 +66,17 @@ public class RefreshTokenServiceImpl implements RefreshTokenService {
         RefreshToken refreshToken = new RefreshToken();
 
         refreshToken.setUser(userRepository.findByEmail(email));
-        refreshToken.setUserCode(refreshToken.getUser().getEmail());
+        refreshToken.setUserCode(refreshToken.getUser().getId());
         refreshToken.setExpirationDate(LocalDateTime.now().plusSeconds(refreshTokenDurationSec));
         refreshToken.setToken(UUID.randomUUID().toString());
 
         return this.tokenRepository.save(refreshToken);
+    }
+
+    @Override
+    public void deleteRefreshToken(Long userId) {
+        RefreshToken refreshToken = tokenRepository.findByUserCode(userId).orElseThrow(()-> new JWTException("Refresh token not found"));
+
+        this.tokenRepository.delete(refreshToken);
     }
 }

@@ -16,11 +16,11 @@ public class RefreshToken implements Serializable {
     private Integer id;
 
     @OneToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "user_code", insertable = false, updatable = false)
+    @JoinColumn(name = "id_user", insertable = false, updatable = false)
     private User user;
 
-    @Column(name = "user_code", nullable = false)
-    private String userCode;
+    @Column(name = "id_user", nullable = false)
+    private Long userCode;
 
     @Column(nullable = false, unique = true)
     private String token;

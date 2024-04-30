@@ -22,9 +22,8 @@ import org.springframework.stereotype.Component;
 @Component
 @Slf4j
 public class JwtUtils {
-
-    @Value("${solo.app.jwtSecret}")
-    private String SECRET_KEY;
+ //   @Value("${solo.app.jwtSecret}")
+    private String SECRET_KEY = "G4Z^XrroxR@dWxqf$mTTKwW$!@#qr4P";
 
     @Value("${solo.app.jwtExpirationSec}")
     private int EXPIRATION_SEC;

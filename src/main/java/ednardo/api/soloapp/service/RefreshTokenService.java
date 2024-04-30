@@ -7,4 +7,5 @@ public interface RefreshTokenService {
     RefreshTokenResponseDTO refreshToken(String requestRefreshToken);
     RefreshToken verifyExpiration(RefreshToken token);
     RefreshToken createRefreshToken(String email);
+    void deleteRefreshToken(Long userId);
 }

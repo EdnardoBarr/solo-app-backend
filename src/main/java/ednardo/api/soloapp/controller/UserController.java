@@ -1,15 +1,17 @@
 package ednardo.api.soloapp.controller;
 
+import ednardo.api.soloapp.model.RefreshToken;
 import ednardo.api.soloapp.model.User;
-import ednardo.api.soloapp.model.dto.LoginRequestDTO;
-import ednardo.api.soloapp.model.dto.RecoveryJwtTokenDTO;
-import ednardo.api.soloapp.model.dto.UserDTO;
+import ednardo.api.soloapp.model.dto.*;
+import ednardo.api.soloapp.service.RefreshTokenService;
 import ednardo.api.soloapp.service.UserService;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.util.MultiValueMap;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -18,16 +20,35 @@ public class UserController {
     @Autowired
     UserService userService;
 
+    @Autowired
+    RefreshTokenService refreshTokenService;
+
     @GetMapping("/{id}")
     public ResponseEntity getUserById(@PathVariable Long id) {
         return ResponseEntity.ok(userService.getById(id));
     }
 
     @PostMapping("/login")
-    public ResponseEntity<RecoveryJwtTokenDTO> authenticateUser(@RequestBody LoginRequestDTO loginRequestDTO) {
+    public ResponseEntity authenticateUser(@RequestBody LoginRequestDTO loginRequestDTO) {
         RecoveryJwtTokenDTO token = userService.authenticateUser(loginRequestDTO);
-        return new ResponseEntity<>(token, HttpStatus.OK);
+        RefreshToken refreshToken = refreshTokenService.createRefreshToken(loginRequestDTO.getEmail());
+
+        return ResponseEntity.ok(new JwtResponseDTO(token.getToken(), refreshToken.getToken()));
     }
+
+    @PostMapping("/logout")
+    public ResponseEntity doLogout(@RequestBody Long userId) {
+        SecurityContextHolder.clearContext();
+        refreshTokenService.deleteRefreshToken(userId);
+        return ResponseEntity.noContent().build();
+    }
+
+    @PostMapping("/refresh-token")
+    public RefreshTokenResponseDTO refreshToken(@RequestBody RefreshTokenRequestDTO request) {
+        String refreshToken = request.getRefreshToken();
+        return this.refreshTokenService.refreshToken(refreshToken);
+    }
+
 
     @PostMapping("/registration")
     public ResponseEntity<String> registerUserAccount(@RequestBody @Valid UserDTO userDTO) {
