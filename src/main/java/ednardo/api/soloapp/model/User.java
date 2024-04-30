@@ -30,12 +30,14 @@ public class User {
     private String surname;
     private String country;
     private String city;
-    @Column(name = "date_of_birth")
-    private String dateOfBirth;
-    @Column(name = "picture_location")
-    private String pictureLocation;
-    private String bio;
-    private boolean active;
+    @Column(name = "date_of_birth", columnDefinition = "varchar(255) default ''")
+    private String dateOfBirth = "";
+    @Column(name = "picture_location", columnDefinition = "varchar(255) default ''")
+    private String pictureLocation = "";
+    @Column(columnDefinition = "varchar(255) default ''")
+    private String bio = "";
+    @Column(columnDefinition = "boolean default true")
+    private boolean active = true;
 
     @ManyToMany(fetch = FetchType.EAGER, cascade = CascadeType.PERSIST)
     @JoinTable(name="user_role",

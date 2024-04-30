@@ -71,12 +71,11 @@ public class UserServiceImpl implements UserService {
                 .surname(userDTO.getSurname())
                 .country(userDTO.getCountry())
                 .city(userDTO.getCity())
-                .dateOfBirth(userDTO.getDateOfBirth())
-               // .roles(List.of(Role.builder().roleName(userDTO.getRoleName()).build()))
-                .active(userDTO.isActive())
+                .dateOfBirth("")
+                .active(true)
                 .roles(List.of(role))
-                .pictureLocation(userDTO.getPictureLocation())
-                .bio(userDTO.getBio())
+                .pictureLocation("")
+                .bio("")
                 .build();
         try {
             userRepository.save(newUser);

@@ -1,8 +1,10 @@
 package ednardo.api.soloapp.config;
 
+import ednardo.api.soloapp.filter.CorsFilter;
 import ednardo.api.soloapp.filter.UserAuthenticationFilter;
 import ednardo.api.soloapp.model.security.MyUserDetailsService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -17,6 +19,12 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.security.web.authentication.www.BasicAuthenticationFilter;
+import org.springframework.web.cors.CorsConfiguration;
+import org.springframework.web.cors.CorsConfigurationSource;
+import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
+
+import java.util.List;
 
 import static org.springframework.security.config.Customizer.withDefaults;
 
@@ -28,6 +36,10 @@ public class SecurityConfig {
 
     @Autowired
     private UserAuthenticationFilter userAuthenticationFilter;
+
+    @Value("${cors.filter.apply}")
+    private Boolean applyCorsFilter;
+
 
     public static final String [] ENDPOINTS_WITH_AUTHENTICATION_NOT_REQUIRED = {
             "/login/**",
@@ -49,26 +61,38 @@ public class SecurityConfig {
     };
 
     public static final String[] SWAGGER_WHITELIST = {
-            "/swagger-ui/**",
-            "/v3/api-docs/**",
-            "/swagger-resources/**",
-            "/swagger-resources",
+            "/swagger-ui/",
+            "/v3/api-docs/",
+            "/swagger-resources/",
             "/login",
             "/hello/**",
             "/user/login",
             "/user/test",
-            "/user/update",
-            "/role/create",
-            "/role/1",
-            "/role/delete/",
+            "/role/",
             "/user/registration",
-            "/swagger-ui/index.html",
-            "/swagger-ui.html",
             "/activity/register",
-            "/activity/update/1",
-            "/activity/1",
             "/**"
     };
+    @Bean
+    CorsFilter corsFilter() {
+        return new CorsFilter(this.applyCorsFilter);
+    }
+
+    @Bean
+    public UserAuthenticationFilter authenticationJwtTokenFilter() {
+        return new UserAuthenticationFilter();
+    }
+
+    @Bean
+    CorsConfigurationSource corsConfigurationSource() {
+        CorsConfiguration configuration = new CorsConfiguration();
+        configuration.addExposedHeader("total-size");
+        configuration.setExposedHeaders(List.of("total-size"));
+        UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
+        source.registerCorsConfiguration("/**", configuration);
+        return source;
+    }
+
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
     //    http.csrf().disable().authorizeRequests().requestMatchers(SWAGGER_WHITELIST).permitAll().anyRequest().authenticated().and().httpBasic();
@@ -81,6 +105,7 @@ public class SecurityConfig {
                 .formLogin(withDefaults())
                 .httpBasic(withDefaults());
 
+        http.addFilterAfter(corsFilter(), BasicAuthenticationFilter.class);
 //         http.csrf().disable() // Desativa a proteção contra CSRF
 //                .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS) // Configura a política de criação de sessão como stateless
 //                .and().authorizeHttpRequests() // Habilita a autorização para as requisições HTTP

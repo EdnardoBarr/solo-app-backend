@@ -36,6 +36,7 @@ public class UserAuthenticationFilter extends OncePerRequestFilter {
     protected void doFilterInternal(HttpServletRequest request,
                                     HttpServletResponse response,
                                     FilterChain filterChain) throws ServletException, IOException {
+      //  response.setContentType("application/json");
         if (checkIfEndpointIsNotPublic(request)) {
             String token = recoveryToken(request);
             if (token != null) {
@@ -63,7 +64,7 @@ public class UserAuthenticationFilter extends OncePerRequestFilter {
 
     private boolean checkIfEndpointIsNotPublic(HttpServletRequest request) {
         String requestURI = request.getRequestURI();
-        System.out.println("REQUESTURI" + requestURI);
+        System.out.println("REQUESTURI " + requestURI);
         return Arrays.asList(SecurityConfig.SWAGGER_WHITELIST).stream().noneMatch(uri -> requestURI.contains(uri));
     }
 

@@ -3,22 +3,39 @@ package ednardo.api.soloapp.model.security;
 import com.auth0.jwt.JWT;
 import com.auth0.jwt.algorithms.Algorithm;
 
+import com.auth0.jwt.exceptions.JWTVerificationException;
+import com.auth0.jwt.exceptions.SignatureVerificationException;
+import com.auth0.jwt.exceptions.TokenExpiredException;
+import io.jsonwebtoken.*;
 import java.time.Instant;
+import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
+import java.util.Date;
 
 import ednardo.api.soloapp.exception.JWTException;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
 
 @Component
+@Slf4j
 public class JwtUtils {
-    private static final String SECRET_KEY = "4Z^XrroxR@dWxqf$mTTKwW$!@#qGr4P";
-    private static final String ISSUER = "pizzurg-api"; // Emissor do token
+
+    @Value("${solo.app.jwtSecret}")
+    private String SECRET_KEY;
+
+    @Value("${solo.app.jwtExpirationSec}")
+    private int EXPIRATION_SEC;
+
+    @Value("${solo.app.jwtIssuer}")
+    private String ISSUER;
+
+    private Algorithm algorithm = Algorithm.HMAC256(SECRET_KEY);
 
     public String generateToken(UserDetails user) {
         try {
-            Algorithm algorithm = Algorithm.HMAC256(SECRET_KEY);
             return JWT.create()
                     .withIssuer(ISSUER)
                     .withIssuedAt(creationDate())
@@ -26,13 +43,12 @@ public class JwtUtils {
                     .withSubject(user.getUsername())
                     .sign(algorithm);
         } catch (JWTException exception) {
-            throw new JWTException("invalid token.");
+            throw new JWTException("Invalid token.");
         }
     }
 
     public String getSubjectFromToken (String token) {
         try {
-            Algorithm algorithm = Algorithm.HMAC256(SECRET_KEY);
             return JWT.require(algorithm)
                     .withIssuer(ISSUER)
                     .build()
@@ -43,13 +59,29 @@ public class JwtUtils {
         }
     }
 
-    private Instant creationDate() {
-        return ZonedDateTime.now(ZoneId.of("America/Recife")).toInstant();
+    public boolean validateJwtToken(String token) {
+        try {
+            JWT.require(algorithm).build().verify(token);
+            return true;
+        } catch (JWTVerificationException e) {
+            log.error("Invalid JWT: {}", e.getMessage());
+        }
+        return false;
     }
 
-    private Instant expirationDate() {
-        return ZonedDateTime.now(ZoneId.of("America/Recife")).plusHours(4).toInstant();
+    private Date creationDate() {
+        LocalDateTime now = LocalDateTime.now();
+        return Date.from(now.atZone(ZoneId.systemDefault()).toInstant());
+       // return ZonedDateTime.now(ZoneId.of("America/Recife")).toInstant();
     }
+
+    private Date expirationDate() {
+        LocalDateTime now = LocalDateTime.now();
+        return Date.from(now.plusSeconds(EXPIRATION_SEC).atZone(ZoneId.systemDefault()).toInstant());
+        //return ZonedDateTime.now(ZoneId.of("America/Recife")).plusHours(4).toInstant();
+    }
+
+
 
 
 
