@@ -3,6 +3,7 @@ package ednardo.api.soloapp.service.impl;
 import ednardo.api.soloapp.exception.JWTException;
 import ednardo.api.soloapp.exception.TokenRefreshException;
 import ednardo.api.soloapp.model.RefreshToken;
+import ednardo.api.soloapp.model.User;
 import ednardo.api.soloapp.model.dto.RefreshTokenResponseDTO;
 import ednardo.api.soloapp.model.security.JwtUtils;
 import ednardo.api.soloapp.model.security.MyUserDetailsService;
@@ -63,14 +64,21 @@ public class RefreshTokenServiceImpl implements RefreshTokenService {
 
     @Override
     public RefreshToken createRefreshToken(String email) {
-        RefreshToken refreshToken = new RefreshToken();
+        User user = userRepository.findByEmail(email);
+      //  RefreshToken refreshToken = tokenRepository.findByUserCode(user.getId()).get();
 
-        refreshToken.setUser(userRepository.findByEmail(email));
-        refreshToken.setUserCode(refreshToken.getUser().getId());
-        refreshToken.setExpirationDate(LocalDateTime.now().plusSeconds(refreshTokenDurationSec));
-        refreshToken.setToken(UUID.randomUUID().toString());
+        if (tokenRepository.findByUserCode(user.getId()).isPresent()) {
+            tokenRepository.delete(tokenRepository.findByUserCode(user.getId()).get());
+        }
 
-        return this.tokenRepository.save(refreshToken);
+        RefreshToken newRefreshToken = new RefreshToken();
+
+        newRefreshToken.setUser(user);
+        newRefreshToken.setUserCode(user.getId());
+        newRefreshToken.setExpirationDate(LocalDateTime.now().plusSeconds(refreshTokenDurationSec));
+        newRefreshToken.setToken(UUID.randomUUID().toString());
+
+        return this.tokenRepository.save(newRefreshToken);
     }
 
     @Override

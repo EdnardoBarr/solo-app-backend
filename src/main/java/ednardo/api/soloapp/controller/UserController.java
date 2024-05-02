@@ -3,6 +3,7 @@ package ednardo.api.soloapp.controller;
 import ednardo.api.soloapp.model.RefreshToken;
 import ednardo.api.soloapp.model.User;
 import ednardo.api.soloapp.model.dto.*;
+import ednardo.api.soloapp.model.security.MyUserDetailsService;
 import ednardo.api.soloapp.service.RefreshTokenService;
 import ednardo.api.soloapp.service.UserService;
 import jakarta.validation.Valid;
@@ -11,6 +12,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.bind.annotation.*;
 
@@ -23,6 +25,9 @@ public class UserController {
     @Autowired
     RefreshTokenService refreshTokenService;
 
+    @Autowired
+    MyUserDetailsService userDetailsService;
+
     @GetMapping("/{id}")
     public ResponseEntity getUserById(@PathVariable Long id) {
         return ResponseEntity.ok(userService.getById(id));
@@ -32,8 +37,9 @@ public class UserController {
     public ResponseEntity authenticateUser(@RequestBody LoginRequestDTO loginRequestDTO) {
         RecoveryJwtTokenDTO token = userService.authenticateUser(loginRequestDTO);
         RefreshToken refreshToken = refreshTokenService.createRefreshToken(loginRequestDTO.getEmail());
+        UserDetails userDetails = userDetailsService.loadUserByUsername(loginRequestDTO.getEmail());
 
-        return ResponseEntity.ok(new JwtResponseDTO(token.getToken(), refreshToken.getToken()));
+        return ResponseEntity.ok(new JwtResponseDTO(userDetails, token.getToken(), refreshToken.getToken()));
     }
 
     @PostMapping("/logout")
