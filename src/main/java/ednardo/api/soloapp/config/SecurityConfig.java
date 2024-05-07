@@ -7,8 +7,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
+import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
@@ -37,26 +39,29 @@ public class SecurityConfig {
     @Autowired
     private UserAuthenticationFilter userAuthenticationFilter;
 
+    @Autowired
+    private AuthEntryPoint authEntryPoint;
+
     @Value("${cors.filter.apply}")
     private Boolean applyCorsFilter;
 
 
-    public static final String [] ENDPOINTS_WITH_AUTHENTICATION_NOT_REQUIRED = {
+    public static final String[] ENDPOINTS_WITH_AUTHENTICATION_NOT_REQUIRED = {
             "/login/**",
             "/user/**",
             "/swagger-ui/**",
             "/test"
     };
 
-    public static final String [] ENDPOINTS_WITH_AUTHENTICATION_REQUIRED = {
+    public static final String[] ENDPOINTS_WITH_AUTHENTICATION_REQUIRED = {
             "/users/test/user"
     };
 
-    public static final String [] ENDPOINTS_USER = {
+    public static final String[] ENDPOINTS_USER = {
             "/users/test/customer"
     };
 
-    public static final String [] ENDPOINTS_ADMIN = {
+    public static final String[] ENDPOINTS_ADMIN = {
             "/users/test/administrator"
     };
 
@@ -67,12 +72,15 @@ public class SecurityConfig {
             "/login",
             "/hello/**",
             "/user/login",
+            //"/user/logged",
             "/user/test",
             "/role/",
-            "/user/registration",
+            "/user/register",
+            "/user/refresh-token",
             "/activity/register",
             "/**"
     };
+
     @Bean
     CorsFilter corsFilter() {
         return new CorsFilter(this.applyCorsFilter);
@@ -95,27 +103,41 @@ public class SecurityConfig {
 
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
-    //    http.csrf().disable().authorizeRequests().requestMatchers(SWAGGER_WHITELIST).permitAll().anyRequest().authenticated().and().httpBasic();
-        http
-                .csrf().disable().authorizeHttpRequests(authorize -> authorize
-                        .requestMatchers(SWAGGER_WHITELIST).permitAll().anyRequest().authenticated()
-                        .and().addFilterBefore(userAuthenticationFilter, UsernamePasswordAuthenticationFilter.class)
+        http.csrf().disable().
+                exceptionHandling().authenticationEntryPoint(this.authEntryPoint).and().
+                sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS).and().authorizeRequests().
+                requestMatchers(SWAGGER_WHITELIST).permitAll().
+                requestMatchers(HttpMethod.OPTIONS, SWAGGER_WHITELIST).permitAll().
+                anyRequest().authenticated();
 
-                )
-                .formLogin(withDefaults())
-                .httpBasic(withDefaults());
-
+        http.addFilterBefore(authenticationJwtTokenFilter(), UsernamePasswordAuthenticationFilter.class);
         http.addFilterAfter(corsFilter(), BasicAuthenticationFilter.class);
+
+        return http.build();
+//        http
+//                .csrf().disable()
+//                .exceptionHandling().authenticationEntryPoint(this.authEntryPoint).and()
+//                .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS).and()
+//                .authorizeHttpRequests(authorize -> authorize
+//                        .requestMatchers(SWAGGER_WHITELIST).permitAll()
+//                        .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
+//                        .anyRequest().authenticated()
+//                        .and().addFilterBefore(authenticationJwtTokenFilter(), UsernamePasswordAuthenticationFilter.class)
+//                )
+//                .formLogin(withDefaults());
+             //   .httpBasic(withDefaults());
+
+     //   http.addFilterAfter(corsFilter(), BasicAuthenticationFilter.class);
 //         http.csrf().disable() // Desativa a proteção contra CSRF
 //                .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS) // Configura a política de criação de sessão como stateless
 //                .and().authorizeHttpRequests() // Habilita a autorização para as requisições HTTP
 //                .requestMatchers(SWAGGER_WHITELIST).permitAll()
 //                .anyRequest().authenticated()
 //                .anyRequest().denyAll();
-                // Adiciona o filtro de autenticação de usuário que criamos, antes do filtro de segurança padrão do Spring Security
-               // .and().addFilterBefore(userAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
+        // Adiciona o filtro de autenticação de usuário que criamos, antes do filtro de segurança padrão do Spring Security
+        // .and().addFilterBefore(userAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
 
-         return http.getOrBuild();
+      //  return http.getOrBuild();
     }
 
 //    @Bean
@@ -124,7 +146,7 @@ public class SecurityConfig {
 //    }
 
     @Bean
-    public PasswordEncoder encoder(){
+    public PasswordEncoder encoder() {
         return new BCryptPasswordEncoder();
     }
 
@@ -136,6 +158,7 @@ public class SecurityConfig {
 
         return authProvider;
     }
+
     @Bean
     public AuthenticationManager authManager(HttpSecurity http) throws Exception {
         return http.getSharedObject(AuthenticationManagerBuilder.class)

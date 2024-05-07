@@ -1,35 +1,20 @@
 package ednardo.api.soloapp.model.dto;
 
 import ednardo.api.soloapp.model.Role;
+import lombok.Data;
 
 import java.util.Collection;
 
+@Data
 public class RecoveryUserDTO {
-    Long id;
-    String email;
-    Collection<Role> roles;
-
-    public Long getId() {
-        return id;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
-    }
-
-    public String getEmail() {
-        return email;
-    }
-
-    public void setEmail(String email) {
-        this.email = email;
-    }
-
-    public Collection<Role> getRoles() {
-        return roles;
-    }
-
-    public void setRoles(Collection<Role> roles) {
-        this.roles = roles;
-    }
+    private Long id;
+    private String email;
+    private String givenName;
+    private String surname;
+    private String country;
+    private String city;
+    private String dateOfBirth;
+    private String bio;
+    private String pictureLocation;
+    private Collection<Role> roles;
 }

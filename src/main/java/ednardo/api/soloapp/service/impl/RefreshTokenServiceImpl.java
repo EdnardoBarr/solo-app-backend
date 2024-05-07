@@ -2,6 +2,7 @@ package ednardo.api.soloapp.service.impl;
 
 import ednardo.api.soloapp.exception.JWTException;
 import ednardo.api.soloapp.exception.TokenRefreshException;
+import ednardo.api.soloapp.exception.UserNotFoundException;
 import ednardo.api.soloapp.model.RefreshToken;
 import ednardo.api.soloapp.model.User;
 import ednardo.api.soloapp.model.dto.RefreshTokenResponseDTO;
@@ -13,8 +14,10 @@ import ednardo.api.soloapp.service.RefreshTokenService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
+import java.security.Principal;
 import java.time.LocalDateTime;
 import java.util.Optional;
 import java.util.UUID;
@@ -64,7 +67,7 @@ public class RefreshTokenServiceImpl implements RefreshTokenService {
 
     @Override
     public RefreshToken createRefreshToken(String email) {
-        User user = userRepository.findByEmail(email);
+        User user = userRepository.findByEmail(email).orElseThrow(()->new UserNotFoundException("User not found"));
       //  RefreshToken refreshToken = tokenRepository.findByUserCode(user.getId()).get();
 
         if (tokenRepository.findByUserCode(user.getId()).isPresent()) {
@@ -82,8 +85,9 @@ public class RefreshTokenServiceImpl implements RefreshTokenService {
     }
 
     @Override
-    public void deleteRefreshToken(Long userId) {
-        RefreshToken refreshToken = tokenRepository.findByUserCode(userId).orElseThrow(()-> new JWTException("Refresh token not found"));
+    public void deleteRefreshToken(Principal principal) {
+        RefreshToken refreshToken = tokenRepository.findByUserCode(userRepository.findByEmail(principal.getName()).get().getId()).orElseThrow(()-> new JWTException("Refresh token not found"));
+        SecurityContextHolder.clearContext();
 
         this.tokenRepository.delete(refreshToken);
     }

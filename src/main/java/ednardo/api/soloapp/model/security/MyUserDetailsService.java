@@ -30,10 +30,7 @@ public class  MyUserDetailsService implements UserDetailsService {
     }
 
     public UserDetails loadUserByUsername(String email) throws UserValidationException {
-        User user = userRepository.findByEmail(email);
-        if (user == null) {
-            throw new UserNotFoundException("User not found.");
-        }
+        User user = userRepository.findByEmail(email).orElseThrow(()-> new UserNotFoundException("User not found"));
 
         boolean enabled = true;
         boolean accountNonExpired = true;

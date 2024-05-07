@@ -1,6 +1,8 @@
 package ednardo.api.soloapp.filter;
 
 import ednardo.api.soloapp.config.SecurityConfig;
+import ednardo.api.soloapp.exception.JWTException;
+import ednardo.api.soloapp.exception.UserNotFoundException;
 import ednardo.api.soloapp.model.User;
 import ednardo.api.soloapp.model.security.JwtUtils;
 import ednardo.api.soloapp.model.security.MyUserDetailsService;
@@ -10,7 +12,10 @@ import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.Ordered;
+import org.springframework.core.annotation.Order;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -20,8 +25,10 @@ import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
 import java.util.Arrays;
+import java.util.Enumeration;
 
 @Component
+@Slf4j
 public class UserAuthenticationFilter extends OncePerRequestFilter {
     @Autowired
     private JwtUtils jwt;
@@ -36,20 +43,22 @@ public class UserAuthenticationFilter extends OncePerRequestFilter {
     protected void doFilterInternal(HttpServletRequest request,
                                     HttpServletResponse response,
                                     FilterChain filterChain) throws ServletException, IOException {
-      //  response.setContentType("application/json");
-        if (checkIfEndpointIsNotPublic(request)) {
-            String token = recoveryToken(request);
-            if (token != null) {
-                String subject = jwt.getSubjectFromToken(token);
-                User user = userRepository.findByEmail(subject);
-                UserDetails userDetails = userDetailsService.loadUserByUsername(user.getEmail());
+      // response.setContentType("application/json");
+        try {
+            if (checkIfEndpointIsNotPublic(request)) {
+                String token = recoveryToken(request);
+                if (token != null && jwt.validateJwtToken(token)) {
+                    String subject = jwt.getSubjectFromToken(token);
+                    User user = userRepository.findByEmail(subject).orElseThrow(()->new UserNotFoundException("User not found"));
+                    UserDetails userDetails = userDetailsService.loadUserByUsername(user.getEmail());
 
-                Authentication authentication = new UsernamePasswordAuthenticationToken(userDetails.getUsername(), null, userDetails.getAuthorities());
+                    Authentication authentication = new UsernamePasswordAuthenticationToken(userDetails.getUsername(), null, userDetails.getAuthorities());
 
-                SecurityContextHolder.getContext().setAuthentication(authentication);
-            } else {
-                throw new RuntimeException("There is no token.");
+                    SecurityContextHolder.getContext().setAuthentication(authentication);
+                }
             }
+        } catch (Exception e) {
+            log.error("Cannot set user authentication: {}", e);
         }
         filterChain.doFilter(request, response);
     }
@@ -64,8 +73,18 @@ public class UserAuthenticationFilter extends OncePerRequestFilter {
 
     private boolean checkIfEndpointIsNotPublic(HttpServletRequest request) {
         String requestURI = request.getRequestURI();
-        System.out.println("REQUESTURI " + requestURI);
         return Arrays.asList(SecurityConfig.SWAGGER_WHITELIST).stream().noneMatch(uri -> requestURI.contains(uri));
+    }
+
+    private String getRequestHeaders(HttpServletRequest request) {
+        Enumeration<String> headerNames = request.getHeaderNames();
+        StringBuilder headers = new StringBuilder();
+        while (headerNames.hasMoreElements()) {
+            String headerName = headerNames.nextElement();
+            String headerValue = request.getHeader(headerName);
+            headers.append(headerName).append(": ").append(headerValue).append("; ");
+        }
+        return headers.toString();
     }
 
 

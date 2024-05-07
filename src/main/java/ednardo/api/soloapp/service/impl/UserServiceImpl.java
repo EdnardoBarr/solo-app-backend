@@ -14,6 +14,8 @@ import ednardo.api.soloapp.model.security.MyUserDetailsService;
 import ednardo.api.soloapp.repository.RoleRepository;
 import ednardo.api.soloapp.repository.UserRepository;
 import ednardo.api.soloapp.service.UserService;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpSession;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -21,6 +23,8 @@ import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
+import org.springframework.security.core.context.SecurityContext;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -56,6 +60,11 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
+    public User getByEmail(String email) {
+        return userRepository.findByEmail(email).orElseThrow(() -> new UserNotFoundException("User not found: " + email));
+    }
+
+    @Override
     public void registerNewUser(final UserDTO userDTO) {
 
         if (userRepository.existsByEmail(userDTO.getEmail())) {
@@ -85,21 +94,23 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public void update(UserDTO userDTO) {
-        User userUpdated = this.userRepository.findByEmail(userDTO.getEmail());
-        if (userUpdated == null) {
-            throw new UserValidationException("User not found.");
-        }
+    @Transactional
+    public void update(Long id, UserDTO userDTO) {
+        User userUpdated = this.userRepository.findById(id).orElseThrow(() -> new UserNotFoundException("User not found"));
 
+        if ((userRepository.existsByEmail(userDTO.getEmail())) && (!userUpdated.getEmail().equals(userDTO.getEmail()))) {
+            throw new UserValidationException("Email is already being used by another user");
+        }
+        userUpdated.setEmail(userDTO.getEmail());
         userUpdated.setGivenName(userDTO.getGivenName());
         userUpdated.setSurname(userDTO.getSurname());
         userUpdated.setCountry(userDTO.getCountry());
         userUpdated.setCity(userDTO.getCity());
         userUpdated.setDateOfBirth(userDTO.getDateOfBirth());
-      //  userUpdated.setRole(userDTO.getRole());
-        userUpdated.setActive(userDTO.isActive());
-        userUpdated.setPassword(passwordEncoder.encode(userDTO.getPassword()));
-       // userUpdated.setEmail(userDTO.getEmail());
+        userUpdated.setBio(userDTO.getBio());
+        //  userUpdated.setRole(userDTO.getRole());
+        //  userUpdated.setActive(userDTO.isActive());
+        // userUpdated.setPassword(passwordEncoder.encode(userDTO.getPassword()));
 
         try {
             this.userRepository.save(userUpdated);
@@ -110,11 +121,7 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public void deleteByEmail(String email) {
-        User user = this.userRepository.findByEmail(email);
-
-        if (user == null) {
-            throw new UserValidationException("User not found.");
-        }
+        User user = this.userRepository.findByEmail(email).orElseThrow(() -> new UserNotFoundException("User not found"));
 
         try {
             user.setActive(false);
@@ -125,14 +132,20 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public RecoveryJwtTokenDTO authenticateUser(LoginRequestDTO loginRequestDTO) {
-            UsernamePasswordAuthenticationToken usernamePasswordAuthenticationToken =
+    public RecoveryJwtTokenDTO authenticateUser(LoginRequestDTO loginRequestDTO, HttpServletRequest request, HttpSession session) {
+        session.invalidate();
+        UsernamePasswordAuthenticationToken usernamePasswordAuthenticationToken =
                 new UsernamePasswordAuthenticationToken(loginRequestDTO.getEmail(), loginRequestDTO.getPassword());
 
-            Authentication authentication = authenticationManager.authenticate(usernamePasswordAuthenticationToken);
+        Authentication authentication = authenticationManager.authenticate(usernamePasswordAuthenticationToken);
 
-            UserDetails userDetails = (UserDetails) userDetailsService.loadUserByUsername(loginRequestDTO.getEmail());
+        SecurityContext securityContext = SecurityContextHolder.getContext();
+        securityContext.setAuthentication(authentication);
 
-            return new RecoveryJwtTokenDTO(jwtUtils.generateToken(userDetails));
+        UserDetails userDetails = (UserDetails) authentication.getPrincipal();
+
+        //   UserDetails userDetails = (UserDetails) userDetailsService.loadUserByUsername(loginRequestDTO.getEmail());
+
+        return new RecoveryJwtTokenDTO(jwtUtils.generateToken(userDetails));
     }
 }

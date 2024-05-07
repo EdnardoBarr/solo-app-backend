@@ -1,5 +1,6 @@
 package ednardo.api.soloapp.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import ednardo.api.soloapp.enums.RoleName;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
@@ -26,6 +27,7 @@ public class Role {
 //    public Role(String role_default) {
 //    }
 
+    @JsonIgnore
     @ManyToMany(mappedBy = "roles")
     private List<User> users;
 }

@@ -6,18 +6,26 @@ import ednardo.api.soloapp.model.dto.*;
 import ednardo.api.soloapp.model.security.MyUserDetailsService;
 import ednardo.api.soloapp.service.RefreshTokenService;
 import ednardo.api.soloapp.service.UserService;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpSession;
 import jakarta.validation.Valid;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.bind.annotation.*;
 
+import java.security.Principal;
+
+@Slf4j
 @RestController
 @RequestMapping("/user")
+@CrossOrigin("http://localhost:5173")
 public class UserController {
     @Autowired
     UserService userService;
@@ -33,9 +41,14 @@ public class UserController {
         return ResponseEntity.ok(userService.getById(id));
     }
 
+    @GetMapping("/retrieve/{email}")
+    public ResponseEntity getUserByEmail(@PathVariable String email) {
+        return ResponseEntity.ok(this.userService.getByEmail(email));
+    }
+
     @PostMapping("/login")
-    public ResponseEntity authenticateUser(@RequestBody LoginRequestDTO loginRequestDTO) {
-        RecoveryJwtTokenDTO token = userService.authenticateUser(loginRequestDTO);
+    public ResponseEntity authenticateUser(@RequestBody LoginRequestDTO loginRequestDTO, HttpServletRequest request, HttpSession session) {
+        RecoveryJwtTokenDTO token = userService.authenticateUser(loginRequestDTO, request, session);
         RefreshToken refreshToken = refreshTokenService.createRefreshToken(loginRequestDTO.getEmail());
         UserDetails userDetails = userDetailsService.loadUserByUsername(loginRequestDTO.getEmail());
 
@@ -43,9 +56,8 @@ public class UserController {
     }
 
     @PostMapping("/logout")
-    public ResponseEntity doLogout(@RequestBody Long userId) {
-        SecurityContextHolder.clearContext();
-        refreshTokenService.deleteRefreshToken(userId);
+    public ResponseEntity doLogout(Principal principal) {
+        refreshTokenService.deleteRefreshToken(principal);
         return ResponseEntity.noContent().build();
     }
 
@@ -55,34 +67,20 @@ public class UserController {
         return this.refreshTokenService.refreshToken(refreshToken);
     }
 
-
-    @PostMapping("/registration")
+    @PostMapping("/register")
     public ResponseEntity<String> registerUserAccount(@RequestBody @Valid UserDTO userDTO) {
         userService.registerNewUser(userDTO);
         return new ResponseEntity<>("User created.", HttpStatus.CREATED);
     }
 
-    @PutMapping("/update")
-    public ResponseEntity<String> updateUser(@RequestBody UserDTO userDTO) {
-        userService.update(userDTO);
+    @PutMapping("/update/{id}")
+    public ResponseEntity<String> updateUser(@PathVariable Long id, @RequestBody UserDTO userDTO) {
+        userService.update(id, userDTO);
         return new ResponseEntity<>("User updated.", HttpStatus.NO_CONTENT);
     }
 
-    @DeleteMapping("")
-
-    @GetMapping("/test")
-    public String getAuthenticationTest() {
-        return "OK";
+    @GetMapping("/logged")
+    public UserDetails getUser(Principal principal) {
+        return this.userDetailsService.loadUserByUsername(principal.getName());
     }
-
-    @GetMapping("/test/user")
-    public ResponseEntity<String>getUserAuthenticationTest() {
-        return new ResponseEntity<>("User Authenticated", HttpStatus.OK);
-    }
-
-    @GetMapping("/test/administrator")
-    public ResponseEntity<String> getAdminAuthenticationTest() {
-        return new ResponseEntity<>("Admin authenticated", HttpStatus.OK);
-    }
-
 }

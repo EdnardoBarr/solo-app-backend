@@ -63,7 +63,9 @@ public class JwtUtils {
             JWT.require(algorithm).build().verify(token);
             return true;
         } catch (JWTVerificationException e) {
-            log.error("Invalid JWT: {}", e.getMessage());
+
+            log.error("Invalid/expired token: {}", e.getMessage());
+           // throw new JWTException("Invalid/expired token. Please login again");
         }
         return false;
     }
@@ -71,13 +73,11 @@ public class JwtUtils {
     private Date creationDate() {
         LocalDateTime now = LocalDateTime.now();
         return Date.from(now.atZone(ZoneId.systemDefault()).toInstant());
-       // return ZonedDateTime.now(ZoneId.of("America/Recife")).toInstant();
     }
 
     private Date expirationDate() {
         LocalDateTime now = LocalDateTime.now();
         return Date.from(now.plusSeconds(EXPIRATION_SEC).atZone(ZoneId.systemDefault()).toInstant());
-        //return ZonedDateTime.now(ZoneId.of("America/Recife")).plusHours(4).toInstant();
     }
 
 
