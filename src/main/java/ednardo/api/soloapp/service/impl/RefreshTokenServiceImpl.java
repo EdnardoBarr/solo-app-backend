@@ -57,7 +57,7 @@ public class RefreshTokenServiceImpl implements RefreshTokenService {
 
     @Override
     public RefreshToken verifyExpiration(RefreshToken token) {
-        if (token.getExpirationDate().isAfter(LocalDateTime.now())) {
+        if (!token.getExpirationDate().isAfter(LocalDateTime.now())) {
             this.tokenRepository.delete(token);
             throw new TokenRefreshException(token.getToken(), "Token expired. Please login again");
         }

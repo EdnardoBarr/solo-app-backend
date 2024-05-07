@@ -77,8 +77,7 @@ public class SecurityConfig {
             "/role/",
             "/user/register",
             "/user/refresh-token",
-            "/activity/register",
-            "/**"
+            "/activity/register"
     };
 
     @Bean
