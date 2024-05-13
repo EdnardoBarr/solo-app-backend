@@ -24,6 +24,7 @@ public class UserDTO {
     private String country;
     private String city;
     private String dateOfBirth;
+    private String oldPassword;
     private String password;
     private String matchingPassword;
     private RoleName roleName;
