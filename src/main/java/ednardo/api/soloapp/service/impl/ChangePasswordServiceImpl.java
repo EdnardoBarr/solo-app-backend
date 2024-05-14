@@ -6,17 +6,20 @@ import ednardo.api.soloapp.model.dto.ChangePasswordDTO;
 import ednardo.api.soloapp.repository.UserRepository;
 import ednardo.api.soloapp.service.ChangePasswordService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.stereotype.Service;
+import org.springframework.web.server.ResponseStatusException;
 
 import static org.springframework.util.StringUtils.hasText;
 
+@Service
 public class ChangePasswordServiceImpl implements ChangePasswordService {
     @Autowired
     UserRepository userRepository;
-
     @Autowired
     PasswordEncoder passwordEncoder;
 
@@ -26,13 +29,13 @@ public class ChangePasswordServiceImpl implements ChangePasswordService {
         User user = userRepository.findByEmail(email).orElseThrow(()->new UserValidationException("User not found"));
 
         if (!hasText(changePasswordDTO.getOldPassword()) || !hasText(changePasswordDTO.getPassword()) || !hasText(changePasswordDTO.getMatchingPassword())) {
-            throw new UserValidationException("Fill out the required fields.");
+            throw new ResponseStatusException(HttpStatus.EXPECTATION_FAILED, "Fill out the required fields");
         }
-        if (!changePasswordDTO.getOldPassword().equals(passwordEncoder.encode(user.getPassword()))) {
-            throw new UserValidationException("Wrong password");
+        if (!passwordEncoder.matches(changePasswordDTO.getOldPassword(), user.getPassword())) {
+            throw new ResponseStatusException(HttpStatus.EXPECTATION_FAILED, "Wrong Password");
         }
         if (!changePasswordDTO.getPassword().equals(changePasswordDTO.getMatchingPassword())) {
-            throw new UserValidationException("Passwords must match");
+            throw new ResponseStatusException(HttpStatus.EXPECTATION_FAILED, "Passwords must match");
         }
 
         user.setPassword(passwordEncoder.encode(changePasswordDTO.getPassword()));
