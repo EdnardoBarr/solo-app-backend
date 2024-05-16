@@ -2,12 +2,27 @@ package ednardo.api.soloapp.service.impl;
 
 import ednardo.api.soloapp.exception.ActivityValidationException;
 import ednardo.api.soloapp.model.Activity;
+import ednardo.api.soloapp.model.LocationActivity;
+import ednardo.api.soloapp.model.User;
+import ednardo.api.soloapp.model.dto.ActivityDTO;
+import ednardo.api.soloapp.model.dto.LocationActivityDTO;
 import ednardo.api.soloapp.repository.ActivityRepository;
 import ednardo.api.soloapp.service.ActivityService;
+import ednardo.api.soloapp.service.LocationActivityService;
 import ednardo.api.soloapp.service.UserService;
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.criteria.CriteriaBuilder;
+import jakarta.persistence.criteria.CriteriaQuery;
+import jakarta.persistence.criteria.Root;
+import org.hibernate.query.Page;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Pageable;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.web.server.ResponseStatusException;
 
+import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -16,7 +31,13 @@ public class ActivityServiceImpl implements ActivityService {
     UserService userService;
 
     @Autowired
+    LocationActivityService locationActivityService;
+
+    @Autowired
     ActivityRepository activityRepository;
+
+    @Autowired
+    EntityManager entityManager;
 
     @Override
     public Optional<Activity> getById(Long id){
@@ -24,21 +45,23 @@ public class ActivityServiceImpl implements ActivityService {
     }
 
     @Override
-    public Activity create(Activity activity) {
-        userService.getById(activity.getOwner().getId());
+    public Activity create(ActivityDTO activityDTO) {
+        User user = userService.getById(activityDTO.getOwnerId());
+        LocationActivityDTO locationActivityDTO = new LocationActivityDTO(activityDTO.getAddress(), activityDTO.getCity(), activityDTO.getCountry(), activityDTO.getCooords());
+        LocationActivity locationActivity = this.locationActivityService.create(locationActivityDTO);
 
         Activity newActivity = Activity.builder()
-                .owner(activity.getOwner())
-                .title(activity.getTitle())
-                .description(activity.getDescription())
-                .mediaLocation(activity.getMediaLocation())
-                .maxParticipants(activity.getMaxParticipants())
-                .category(activity.getCategory())
-                .startsAt(activity.getStartsAt())
-                .finishesAt(activity.getFinishesAt())
-                .createdAt(activity.getCreatedAt())
-                .active(true)
-                .location(activity.getLocation())
+                .owner(user)
+                .title(activityDTO.getTitle())
+                .description(activityDTO.getDescription())
+                .mediaLocation("http://")
+                .maxParticipants(activityDTO.getMaxParticipants())
+                .category(activityDTO.getCategory())
+                .startsAt(activityDTO.getStartsAt())
+                .finishesAt(activityDTO.getFinishesAt())
+                .location(locationActivity)
+                .createdAt(LocalDateTime.now())
+                .active(activityDTO.getActive())
                 .build();
 
         return this.activityRepository.save(newActivity);
@@ -69,6 +92,23 @@ public class ActivityServiceImpl implements ActivityService {
         activity.setActive(false);
         activityRepository.save(activity);
     }
+
+    @Override
+    public List<Activity> getAll() {
+        List<Activity> allAcitvities = activityRepository.findAll();
+
+        return allAcitvities;
+    }
+
+//    @Override
+//    public Page<Activity> getAll(ActivityDTO activityDTO, Pageable pageable) {
+//        CriteriaBuilder cb = entityManager.getCriteriaBuilder();
+//        CriteriaQuery<Activity> cq = cb.createQuery(Activity.class);
+//        Root<Activity>
+//
+//    }
+
+
 
 
 

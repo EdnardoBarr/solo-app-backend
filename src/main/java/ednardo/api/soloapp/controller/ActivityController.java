@@ -2,6 +2,7 @@ package ednardo.api.soloapp.controller;
 
 import ednardo.api.soloapp.exception.ActivityValidationException;
 import ednardo.api.soloapp.model.Activity;
+import ednardo.api.soloapp.model.dto.ActivityDTO;
 import ednardo.api.soloapp.service.ActivityService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -22,9 +23,9 @@ public class ActivityController {
     }
 
 
-    @PostMapping("/register")
-    public ResponseEntity registerActivity (@RequestBody Activity activity) {
-        activityService.create(activity);
+    @PostMapping("/add")
+    public ResponseEntity registerActivity (@RequestBody ActivityDTO activityDTO) {
+        activityService.create(activityDTO);
 
         return new ResponseEntity<>("Activity created", HttpStatus.CREATED);
     }

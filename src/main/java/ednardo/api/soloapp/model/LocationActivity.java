@@ -17,9 +17,6 @@ public class LocationActivity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    @JsonIgnore
-    @OneToOne(mappedBy = "location")
-    private Activity activity;
     private String country;
     private String city;
     private String address;
