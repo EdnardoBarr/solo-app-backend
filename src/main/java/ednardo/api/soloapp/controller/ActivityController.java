@@ -5,6 +5,8 @@ import ednardo.api.soloapp.model.Activity;
 import ednardo.api.soloapp.model.dto.ActivityDTO;
 import ednardo.api.soloapp.service.ActivityService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -20,6 +22,11 @@ public class ActivityController {
         Activity activity = activityService.getById(id).orElseThrow(()-> new ActivityValidationException("Activity not found"));
 
         return ResponseEntity.ok(activity);
+    }
+
+    @GetMapping("/all")
+    public Page<Activity> getAllActivities(Pageable pageable) {
+        return this.activityService.getAll(pageable);
     }
 
 

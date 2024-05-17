@@ -2,7 +2,7 @@ package ednardo.api.soloapp.service;
 
 import ednardo.api.soloapp.model.Activity;
 import ednardo.api.soloapp.model.dto.ActivityDTO;
-import org.hibernate.query.Page;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
 import java.util.List;
@@ -14,6 +14,6 @@ public interface ActivityService {
     void update(Long id, Activity activity);
     void deleteById(Long id);
     List<Activity> getAll();
-//    Page<Activity> getAll(ActivityDTO activityDTO, Pageable pageable)
+    Page<Activity> getAll(Pageable pageable);
 
 }
