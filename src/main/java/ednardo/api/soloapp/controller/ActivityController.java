@@ -3,10 +3,12 @@ package ednardo.api.soloapp.controller;
 import ednardo.api.soloapp.exception.ActivityValidationException;
 import ednardo.api.soloapp.model.Activity;
 import ednardo.api.soloapp.model.dto.ActivityDTO;
+import ednardo.api.soloapp.model.dto.ActivityFilterDTO;
 import ednardo.api.soloapp.service.ActivityService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -24,9 +26,11 @@ public class ActivityController {
         return ResponseEntity.ok(activity);
     }
 
-    @GetMapping("/all")
-    public Page<Activity> getAllActivities(Pageable pageable) {
-        return this.activityService.getAll(pageable);
+    @GetMapping
+    public ResponseEntity getAllActivities(ActivityFilterDTO activityFilterDTO, @PageableDefault(size = 4, page = 0) Pageable pageable) {
+        Page<Activity> activities = this.activityService.getAll(activityFilterDTO, pageable);
+
+        return ResponseEntity.ok(activities);
     }
 
 
@@ -48,6 +52,6 @@ public class ActivityController {
     public ResponseEntity deleteActivity(@PathVariable Long id) {
         activityService.deleteById(id);
 
-        return new ResponseEntity<>("Activiti deleted", HttpStatus.NO_CONTENT);
+        return new ResponseEntity<>("Activity deleted", HttpStatus.NO_CONTENT);
     }
 }
