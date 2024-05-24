@@ -40,6 +40,7 @@ public class RefreshTokenServiceImpl implements RefreshTokenService {
         return this.findByToken(requestRefreshToken)
                 .map(this::verifyExpiration)
                 .map(refreshToken -> {
+
                     String email = refreshToken.getUser().getEmail();
                     String token = jwtUtils.generateToken(userDetailsService.loadUserByUsername(email));
 

@@ -130,7 +130,7 @@ public class ActivityServiceImpl implements ActivityService {
         }
         if (nonNull(activityFilterDTO.getCategory())) {
             Expression<String> upper = cb.upper(activityRoot.get("category"));
-            Predicate activity = cb.like(upper, "%" + activityFilterDTO.getCategory().toUpperCase() + "%");
+            Predicate activity = cb.like(upper, "%" + activityFilterDTO.getCategory().name().toUpperCase() + "%");
             predicates.add(activity);
         }
         if (nonNull(activityFilterDTO.getInitialStartDate())) {

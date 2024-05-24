@@ -33,7 +33,6 @@ public class ActivityController {
         return ResponseEntity.ok(activities);
     }
 
-
     @PostMapping("/add")
     public ResponseEntity registerActivity (@RequestBody ActivityDTO activityDTO) {
         activityService.create(activityDTO);
@@ -54,4 +53,5 @@ public class ActivityController {
 
         return new ResponseEntity<>("Activity deleted", HttpStatus.NO_CONTENT);
     }
+
 }

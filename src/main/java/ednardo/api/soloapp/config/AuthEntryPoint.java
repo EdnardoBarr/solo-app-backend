@@ -21,7 +21,6 @@ public class AuthEntryPoint implements AuthenticationEntryPoint {
     public void commence(
             HttpServletRequest request, HttpServletResponse response, AuthenticationException authException)
             throws IOException {
-        //SecurityContextHolder.clearContext();
         log.error("Unauthorized error: {}", authException.getMessage());
         response.setContentType(MediaType.APPLICATION_JSON_VALUE);
         response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
@@ -35,10 +34,4 @@ public class AuthEntryPoint implements AuthenticationEntryPoint {
         final ObjectMapper mapper = new ObjectMapper();
         mapper.writeValue(response.getOutputStream(), body);
     }
-
-//    @Override
-//    public void afterPropertiesSet() {
-//        setRealmName("Sistuf");
-//        super.afterPropertiesSet();
-//    }
 }

@@ -20,9 +20,9 @@ public class ActivityMemberController {
         return ResponseEntity.ok(activityMember);
     }
 
-    @PostMapping("/request")
-    public ResponseEntity requestToJoinActivity(@RequestBody ActivityMember activityMember) {
-        this.activityMemberService.requestToJoin(activityMember);
+    @PostMapping("/request/{activityId}")
+    public ResponseEntity requestToJoinActivity(@PathVariable Long activityId, @RequestBody Long userId) {
+        this.activityMemberService.requestToJoin(activityId, userId);
 
         return new ResponseEntity<>("Request to join the activity has been sent", HttpStatus.CREATED);
     }

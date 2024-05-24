@@ -1,19 +1,18 @@
 package ednardo.api.soloapp.exception.handler;
 
+import ednardo.api.soloapp.exception.ActivityValidationException;
 import ednardo.api.soloapp.exception.TokenRefreshException;
 import ednardo.api.soloapp.model.dto.ErrorDTO;
 import ednardo.api.soloapp.model.dto.FieldErrorDTO;
 import io.micrometer.common.lang.NonNull;
-import org.springframework.core.Ordered;
-import org.springframework.core.annotation.Order;
 import org.springframework.core.convert.ConversionFailedException;
+import org.springframework.dao.DataAccessException;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageNotReadableException;
-import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.validation.BindException;
 import org.springframework.validation.FieldError;
@@ -24,6 +23,7 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.context.request.WebRequest;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
 
+import java.sql.SQLException;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -64,12 +64,20 @@ public class RestResponseExceptionHandler extends ResponseEntityExceptionHandler
         return handleExceptionInternal(ex, errorDTO, new HttpHeaders(), httpStatus, webRequest);
     }
 
-    @ExceptionHandler(value = ConversionFailedException.class)
-    public ResponseEntity<Object> handleConversionFailedException(RuntimeException ex,  WebRequest webRequest) {
+    @ExceptionHandler(value = {ConversionFailedException.class, ActivityValidationException.class})
+    public ResponseEntity<Object> handleBadRequestExceptions(RuntimeException ex, WebRequest webRequest) {
         HttpStatus httpStatus = HttpStatus.BAD_REQUEST;
         ErrorDTO errorDTO = ErrorDTO.builder().code(httpStatus.value()).message(ex.getMessage()).build();
         return handleExceptionInternal(ex, errorDTO, new HttpHeaders(), httpStatus, webRequest);
     }
+
+    @ExceptionHandler(value = {DataAccessException.class, SQLException.class})
+    public ResponseEntity<Object> handleDatabaseExceptions(RuntimeException ex, WebRequest webRequest) {
+        HttpStatus httpStatus = HttpStatus.BAD_REQUEST;
+        ErrorDTO errorDTO = ErrorDTO.builder().code(httpStatus.value()).message("An error occured during the operation. Please contact the administrator of the system").build();
+        return handleExceptionInternal(ex, errorDTO, new HttpHeaders(), httpStatus, webRequest);
+    }
+
 
     @ExceptionHandler(value = NullPointerException.class)
     public ResponseEntity<Object> handleNullPointerException(NullPointerException ex, WebRequest request) {

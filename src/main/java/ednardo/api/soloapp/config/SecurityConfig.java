@@ -73,11 +73,9 @@ public class SecurityConfig {
             "/hello/**",
             "/user/login",
             //"/user/logged",
-            "/user/test",
             "/role/",
             "/user/register",
             "/user/refresh-token",
-            "/activity/register"
     };
 
     @Bean

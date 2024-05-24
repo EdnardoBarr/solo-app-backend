@@ -1,6 +1,7 @@
 package ednardo.api.soloapp.model.dto;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import ednardo.api.soloapp.enums.ActivityCategory;
 import ednardo.api.soloapp.model.ActivityMember;
 import ednardo.api.soloapp.model.LocationActivity;
 import ednardo.api.soloapp.model.User;
@@ -25,7 +26,8 @@ public class ActivityDTO {
     private String title;
     private String description;
     private int maxParticipants;
-    private String category;
+    @Enumerated(EnumType.STRING)
+    private ActivityCategory category;
     private LocalDateTime startsAt;
     private LocalDateTime finishesAt;
     private Boolean active;

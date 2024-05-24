@@ -1,6 +1,7 @@
 package ednardo.api.soloapp.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import ednardo.api.soloapp.enums.ActivityCategory;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -34,7 +35,8 @@ public class Activity {
     private String mediaLocation;
     @Column(name = "max_participants")
     private int maxParticipants;
-    private String category;
+    @Enumerated(EnumType.STRING)
+    private ActivityCategory category;
     @Column(name = "starts_at")
     private LocalDateTime startsAt;
     @Column(name = "finishes_at")

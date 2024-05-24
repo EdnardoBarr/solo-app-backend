@@ -15,6 +15,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
+import java.util.Optional;
 
 @Service
 public class ActivityMemberServiceImpl implements ActivityMemberService {
@@ -29,33 +30,45 @@ public class ActivityMemberServiceImpl implements ActivityMemberService {
 
     @Override
     public ActivityMember getById(Long id) {
-        return this.activityMemberRepository.findById(id).orElseThrow(()-> new ActivityMemberException("Not found"));
+        return this.activityMemberRepository.findById(id).orElseThrow(() -> new ActivityMemberException("Not found"));
     }
 
     @Override
-    public ActivityMember requestToJoin (ActivityMember activityMember) {
-       Activity activity = activityService.getById(activityMember.getActivity().getId()).orElseThrow(()-> new ActivityValidationException("Activity not found"));
-       User user = userService.getById(activityMember.getMember().getId());
+    public void requestToJoin(Long activityId, Long userId) {
+        Activity activity = activityService.getById(activityId).orElseThrow(() -> new ActivityValidationException("Activity not found"));
+        User user = userService.getById(userId);
 
-       if (activity.getOwner().getId() ==  user.getId()) {
-           throw new ActivityValidationException("User is the owner of the activity");
-       }
+        if (activity.getOwner().getId().equals(userId)) {
+            throw new ActivityValidationException("User is the owner of the activity");
+        }
 
-       ActivityMember newActivityMember = ActivityMember.builder()
-               .member(user)
-               .activity(activity)
-               .status(ActivityStatus.MEMBER_PENDING)
-               .privilege(ActivityMemberPrivilege.PRIVILEGE_DEFAULT)
-               .createdAt(LocalDateTime.now())
-               .updatedAt(null)
-               .build();
+        try {
+            Optional<ActivityMember> activityMember = activityMemberRepository.findByActivityIdAndMemberId(activityId, userId);
+            if (activityMember.isPresent()) {
+                activityMember.get().setStatus(ActivityStatus.MEMBER_ACCEPTED);
+                activityMember.get().setUpdatedAt(LocalDateTime.now());
 
-       return this.activityMemberRepository.save(newActivityMember);
+                this.activityMemberRepository.save(activityMember.get());
+            } else {
+                ActivityMember newActivityMember = ActivityMember.builder()
+                        .member(user)
+                        .activity(activity)
+                        .status(ActivityStatus.MEMBER_PENDING)
+                        .privilege(ActivityMemberPrivilege.PRIVILEGE_DEFAULT)
+                        .createdAt(LocalDateTime.now())
+                        .updatedAt(null)
+                        .build();
+
+                this.activityMemberRepository.save(newActivityMember);
+            }
+        } catch (Exception exception) {
+            throw new ActivityValidationException("An error occurred while processing the request");
+        }
     }
 
     @Override
     public void update(Long id, ActivityMember activityMember) {
-        ActivityMember newActivityMember = activityMemberRepository.findById(id).orElseThrow(()-> new ActivityMemberException("User didn't request to join the activity"));
+        ActivityMember newActivityMember = activityMemberRepository.findById(id).orElseThrow(() -> new ActivityMemberException("User didn't request to join the activity"));
 
         newActivityMember.setStatus(activityMember.getStatus());
         newActivityMember.setPrivilege(activityMember.getPrivilege());
