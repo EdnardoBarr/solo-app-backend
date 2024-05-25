@@ -5,6 +5,7 @@ import ednardo.api.soloapp.exception.TokenRefreshException;
 import ednardo.api.soloapp.model.dto.ErrorDTO;
 import ednardo.api.soloapp.model.dto.FieldErrorDTO;
 import io.micrometer.common.lang.NonNull;
+import org.hibernate.query.sqm.produce.function.FunctionArgumentException;
 import org.springframework.core.convert.ConversionFailedException;
 import org.springframework.dao.DataAccessException;
 import org.springframework.dao.EmptyResultDataAccessException;
@@ -71,7 +72,7 @@ public class RestResponseExceptionHandler extends ResponseEntityExceptionHandler
         return handleExceptionInternal(ex, errorDTO, new HttpHeaders(), httpStatus, webRequest);
     }
 
-    @ExceptionHandler(value = {DataAccessException.class, SQLException.class})
+    @ExceptionHandler(value = {DataAccessException.class, SQLException.class, FunctionArgumentException.class})
     public ResponseEntity<Object> handleDatabaseExceptions(RuntimeException ex, WebRequest webRequest) {
         HttpStatus httpStatus = HttpStatus.BAD_REQUEST;
         ErrorDTO errorDTO = ErrorDTO.builder().code(httpStatus.value()).message("An error occured during the operation. Please contact the administrator of the system").build();
