@@ -4,20 +4,26 @@ import ednardo.api.soloapp.enums.RoleName;
 import ednardo.api.soloapp.exception.UserAlreadyExistsException;
 import ednardo.api.soloapp.exception.UserNotFoundException;
 import ednardo.api.soloapp.exception.UserValidationException;
+import ednardo.api.soloapp.model.Activity;
+import ednardo.api.soloapp.model.LocationActivity;
 import ednardo.api.soloapp.model.Role;
 import ednardo.api.soloapp.model.User;
-import ednardo.api.soloapp.model.dto.LoginRequestDTO;
-import ednardo.api.soloapp.model.dto.RecoveryJwtTokenDTO;
-import ednardo.api.soloapp.model.dto.UserDTO;
+import ednardo.api.soloapp.model.dto.*;
 import ednardo.api.soloapp.model.security.JwtUtils;
 import ednardo.api.soloapp.model.security.MyUserDetailsService;
 import ednardo.api.soloapp.repository.RoleRepository;
 import ednardo.api.soloapp.repository.UserRepository;
 import ednardo.api.soloapp.service.UserService;
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.TypedQuery;
+import jakarta.persistence.criteria.*;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpSession;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -29,9 +35,12 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
+
+import static java.util.Objects.nonNull;
 
 @Service
 @Transactional
@@ -54,6 +63,40 @@ public class UserServiceImpl implements UserService {
     @Autowired
     private PasswordEncoder passwordEncoder;
 
+    @Autowired
+    EntityManager entityManager;
+
+    public Long count(UserFilterDTO userFilterDTO) {
+        CriteriaBuilder cb = entityManager.getCriteriaBuilder();
+        CriteriaQuery<Long> cq = cb.createQuery(Long.class);
+        Root<User> root = cq.from(User.class);
+        cq.select(cb.count(root));
+        List<Predicate> predicates = this.buildPredicates(userFilterDTO, cb, root);
+        cq.where(predicates.toArray(Predicate[]::new));
+        return entityManager.createQuery(cq).getSingleResult();
+    }
+
+    private List<Predicate> buildPredicates(UserFilterDTO userFilterDTO, CriteriaBuilder cb, Root<User> root) {
+        List<Predicate> predicates = new ArrayList<>();
+        if (nonNull(userFilterDTO.getGivenName())) {
+            Expression<String> upper = cb.upper(root.get("given_name"));
+            Predicate user = cb.like(upper, "%" + userFilterDTO.getGivenName().toUpperCase() + "%");
+            predicates.add(user);
+        }
+        if (nonNull(userFilterDTO.getCity())) {
+            Expression<String> upper = cb.upper(root.get("city"));
+            Predicate user = cb.like(upper, "%" + userFilterDTO.getCity().toUpperCase() + "%");
+            predicates.add(user);
+        }
+//        if (nonNull(userFilterDTO.getCategory())) {
+//            Expression<String> upper = cb.upper(activityRoot.get("category"));
+//            Predicate activity = cb.like(upper, "%" + activityFilterDTO.getCategory().name().toUpperCase() + "%");
+//            predicates.add(activity);
+//        }
+
+        return predicates;
+    }
+
     @Override
     public User getById(Long id) {
         return userRepository.findById(id).orElseThrow(() -> new UserNotFoundException("User not found"));
@@ -62,6 +105,20 @@ public class UserServiceImpl implements UserService {
     @Override
     public User getByEmail(String email) {
         return userRepository.findByEmail(email).orElseThrow(() -> new UserNotFoundException("User not found: " + email));
+    }
+
+    @Override
+    public Page<User> getAll(UserFilterDTO userFilterDTO, Pageable pageable) {
+        CriteriaBuilder cb = entityManager.getCriteriaBuilder();
+        CriteriaQuery<User> cq = cb.createQuery(User.class);
+        Root<User> root = cq.from(User.class);
+        List<Predicate> predicates = this.buildPredicates(userFilterDTO, cb, root);
+
+        cq.where(predicates.toArray(Predicate[]::new));
+        int offset = pageable.getPageSize() * pageable.getPageNumber();
+        TypedQuery<User> query = entityManager.createQuery(cq).setMaxResults(pageable.getPageSize()).setFirstResult(offset);
+
+        return new PageImpl<>(query.getResultList(), pageable, this.count(userFilterDTO));
     }
 
     @Override
@@ -83,6 +140,7 @@ public class UserServiceImpl implements UserService {
                 .dateOfBirth("")
                 .active(true)
                 .roles(List.of(role))
+                .interests(List.of())
                 .pictureLocation("")
                 .bio("")
                 .build();
@@ -101,6 +159,7 @@ public class UserServiceImpl implements UserService {
         if ((userRepository.existsByEmail(userDTO.getEmail())) && (!userUpdated.getEmail().equals(userDTO.getEmail()))) {
             throw new UserValidationException("Email is already being used by another user");
         }
+        System.out.println(userDTO.getInterests());
         userUpdated.setEmail(userDTO.getEmail());
         userUpdated.setGivenName(userDTO.getGivenName());
         userUpdated.setSurname(userDTO.getSurname());
@@ -108,6 +167,8 @@ public class UserServiceImpl implements UserService {
         userUpdated.setCity(userDTO.getCity());
         userUpdated.setDateOfBirth(userDTO.getDateOfBirth());
         userUpdated.setBio(userDTO.getBio());
+        userUpdated.setInterests(userDTO.getInterests());
+
         //  userUpdated.setRole(userDTO.getRole());
         //  userUpdated.setActive(userDTO.isActive());
         // userUpdated.setPassword(passwordEncoder.encode(userDTO.getPassword()));

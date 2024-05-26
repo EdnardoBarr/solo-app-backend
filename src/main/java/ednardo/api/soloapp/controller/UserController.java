@@ -1,5 +1,6 @@
 package ednardo.api.soloapp.controller;
 
+import ednardo.api.soloapp.model.Activity;
 import ednardo.api.soloapp.model.RefreshToken;
 import ednardo.api.soloapp.model.User;
 import ednardo.api.soloapp.model.dto.*;
@@ -11,6 +12,9 @@ import jakarta.servlet.http.HttpSession;
 import jakarta.validation.Valid;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
@@ -39,6 +43,13 @@ public class UserController {
     @GetMapping("/{id}")
     public ResponseEntity getUserById(@PathVariable Long id) {
         return ResponseEntity.ok(userService.getById(id));
+    }
+
+    @GetMapping("/all")
+    public ResponseEntity getAllUsers(UserFilterDTO userFilterDTO, @PageableDefault(size = 4, page = 0) Pageable pageable) {
+        Page<User> users = this.userService.getAll(userFilterDTO, pageable);
+
+        return ResponseEntity.ok(users);
     }
 
     @GetMapping("/retrieve/{email}")

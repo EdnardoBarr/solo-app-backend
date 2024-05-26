@@ -1,6 +1,7 @@
 package ednardo.api.soloapp.model.dto;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import ednardo.api.soloapp.enums.ActivityCategory;
 import ednardo.api.soloapp.enums.RoleName;
 import ednardo.api.soloapp.model.Role;
 import ednardo.api.soloapp.validation.PasswordMatches;
@@ -28,6 +29,7 @@ public class UserDTO {
     private String password;
     private String matchingPassword;
     private RoleName roleName;
+    private List<ActivityCategory> interests;
     private boolean active;
     private String pictureLocation;
     private String bio;

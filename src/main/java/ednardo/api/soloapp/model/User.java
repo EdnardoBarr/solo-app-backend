@@ -2,6 +2,7 @@ package ednardo.api.soloapp.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
+import ednardo.api.soloapp.enums.ActivityCategory;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -36,6 +37,12 @@ public class User {
     private String bio = "";
     @Column(columnDefinition = "boolean default true")
     private boolean active = true;
+
+    @ElementCollection(targetClass = ActivityCategory.class)
+    @CollectionTable(name = "user_interests", joinColumns = @JoinColumn(name = "user_id"))
+    @Enumerated(EnumType.STRING)
+    @Column(name = "interest")
+    private List<ActivityCategory> interests;
 
     @ManyToMany(fetch = FetchType.EAGER, cascade = CascadeType.PERSIST)
     @JoinTable(name="user_role",
