@@ -1,6 +1,7 @@
 package ednardo.api.soloapp.controller;
 
 import ednardo.api.soloapp.model.ActivityMember;
+import ednardo.api.soloapp.model.dto.JoinActivityRequestDTO;
 import ednardo.api.soloapp.service.ActivityMemberService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -20,9 +21,9 @@ public class ActivityMemberController {
         return ResponseEntity.ok(activityMember);
     }
 
-    @PostMapping("/request/{activityId}")
-    public ResponseEntity requestToJoinActivity(@PathVariable Long activityId, @RequestBody Long userId) {
-        this.activityMemberService.requestToJoin(activityId, userId);
+    @PostMapping("/join")
+    public ResponseEntity requestToJoinActivity(@RequestBody JoinActivityRequestDTO joinActivityRequestDTO) {
+        this.activityMemberService.requestToJoin(joinActivityRequestDTO);
 
         return new ResponseEntity<>("Request to join the activity has been sent", HttpStatus.CREATED);
     }

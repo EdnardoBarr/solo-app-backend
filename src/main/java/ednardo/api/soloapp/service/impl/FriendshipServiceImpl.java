@@ -4,6 +4,7 @@ import ednardo.api.soloapp.enums.FriendshipStatus;
 
 import ednardo.api.soloapp.model.Friendship;
 import ednardo.api.soloapp.model.User;
+import ednardo.api.soloapp.model.dto.RequestFriendshipDTO;
 import ednardo.api.soloapp.repository.FriendshipRepository;
 import ednardo.api.soloapp.service.FriendshipService;
 import ednardo.api.soloapp.service.UserService;
@@ -23,8 +24,8 @@ public class FriendshipServiceImpl implements FriendshipService {
     FriendshipRepository friendshipRepository;
 
     @Override
-    public Optional<Friendship> findFriendship(Long fromId, Long toId) {
-        return this.friendshipRepository.findFriendshipByUsers(fromId, toId);
+    public Optional<Friendship> findFriendship(User userFrom, User userTo) {
+        return this.friendshipRepository.findFriendshipByUsers(userFrom, userTo);
     }
 
     @Override
@@ -34,11 +35,11 @@ public class FriendshipServiceImpl implements FriendshipService {
 
     @Override
     @Transactional
-    public Friendship requestFriendship(User userFrom, User userTo) {
-        User newUserFrom = userService.getById(userFrom.getId());
-        User newUserTo = userService.getById(userTo.getId());
+    public Friendship requestFriendship(RequestFriendshipDTO requestFriendshipDTO) {
+        User newUserFrom = userService.getById(requestFriendshipDTO.getFromId());
+        User newUserTo = userService.getById(requestFriendshipDTO.getToId());
 
-        Optional<Friendship> existingFriendship = findFriendship(userFrom.getId(), userTo.getId());
+        Optional<Friendship> existingFriendship = this.friendshipRepository.findFriendshipByUsers(newUserFrom, newUserTo);
 
         if (existingFriendship.isPresent()) {
             FriendshipStatus currentStatus = existingFriendship.get().getStatus();
@@ -53,8 +54,8 @@ public class FriendshipServiceImpl implements FriendshipService {
                 case FRIENDSHIP_DECLINED:
                 case FRIENDSHIP_REMOVED:
                     Friendship friendship = existingFriendship.get();
-                    friendship.setFrom(userFrom);
-                    friendship.setTo(userTo);
+                    friendship.setFrom(newUserFrom);
+                    friendship.setTo(newUserTo);
                     friendship.setStatus(FriendshipStatus.FRIENDSHIP_PENDING);
                     friendship.setUpdatedAt(LocalDateTime.now());
                     return friendshipRepository.save(friendship);

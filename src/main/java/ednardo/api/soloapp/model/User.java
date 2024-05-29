@@ -33,7 +33,7 @@ public class User {
     private String dateOfBirth = "";
     @Column(name = "picture_location", columnDefinition = "varchar(255) default ''")
     private String pictureLocation = "";
-    @Column(columnDefinition = "varchar(255) default ''")
+    @Column(columnDefinition = "varchar(1000) default ''")
     private String bio = "";
     @Column(columnDefinition = "boolean default true")
     private boolean active = true;

@@ -22,7 +22,7 @@ public class Activity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    @JsonIgnore
+   // @JsonIgnore
     @ManyToOne
     @JoinColumn(name = "user_id")
     private User owner;

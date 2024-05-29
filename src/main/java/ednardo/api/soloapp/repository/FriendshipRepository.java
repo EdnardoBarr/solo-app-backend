@@ -11,8 +11,8 @@ import java.util.Optional;
 
 public interface FriendshipRepository extends JpaRepository<Friendship, Long> {
 
-    @Query("SELECT f From Friendship f WHERE (f.from = :fromId AND f.to = : toId) OR (f.from = :toId AND f.to = :fromId)")
-    Optional<Friendship> findFriendshipByUsers(@Param("fromId") Long fromId, @Param("toId") Long toId);
+    @Query("SELECT f From Friendship f WHERE (f.from = :userFrom AND f.to = : userTo) OR (f.from = :userTo AND f.to = :userFrom)")
+    Optional<Friendship> findFriendshipByUsers(@Param("userFrom") User userFrom, @Param("userTo") User userTo);
 
     @Query("SELECT CASE WHEN f.from.id = :userId THEN f.to ELSE f.from END FROM Friendship f " +
             "WHERE (f.from.id = :userId OR f.to.id = :userId) AND f.status = 'FRIENDSHIP_ACCEPTED'")

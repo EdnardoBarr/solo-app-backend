@@ -1,5 +1,6 @@
 package ednardo.api.soloapp.service.impl;
 
+import ednardo.api.soloapp.enums.ActivityCategory;
 import ednardo.api.soloapp.enums.RoleName;
 import ednardo.api.soloapp.exception.UserAlreadyExistsException;
 import ednardo.api.soloapp.exception.UserNotFoundException;
@@ -39,6 +40,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 import static java.util.Objects.nonNull;
 
@@ -79,7 +81,7 @@ public class UserServiceImpl implements UserService {
     private List<Predicate> buildPredicates(UserFilterDTO userFilterDTO, CriteriaBuilder cb, Root<User> root) {
         List<Predicate> predicates = new ArrayList<>();
         if (nonNull(userFilterDTO.getGivenName())) {
-            Expression<String> upper = cb.upper(root.get("given_name"));
+            Expression<String> upper = cb.upper(root.get("givenName"));
             Predicate user = cb.like(upper, "%" + userFilterDTO.getGivenName().toUpperCase() + "%");
             predicates.add(user);
         }
@@ -88,11 +90,13 @@ public class UserServiceImpl implements UserService {
             Predicate user = cb.like(upper, "%" + userFilterDTO.getCity().toUpperCase() + "%");
             predicates.add(user);
         }
-//        if (nonNull(userFilterDTO.getCategory())) {
-//            Expression<String> upper = cb.upper(activityRoot.get("category"));
-//            Predicate activity = cb.like(upper, "%" + activityFilterDTO.getCategory().name().toUpperCase() + "%");
-//            predicates.add(activity);
-//        }
+        if (nonNull(userFilterDTO.getInterests())) {
+            Join<User, ActivityCategory> interestsJoin = root.join("interests");
+            Predicate interestsPredicate = interestsJoin.in(userFilterDTO.getInterests().stream()
+                    .map(ActivityCategoryDTO::toEntity)
+                    .collect(Collectors.toList()));
+            predicates.add(interestsPredicate);
+        }
 
         return predicates;
     }

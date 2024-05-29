@@ -1,6 +1,7 @@
 package ednardo.api.soloapp.controller;
 
 import ednardo.api.soloapp.model.User;
+import ednardo.api.soloapp.model.dto.RequestFriendshipDTO;
 import ednardo.api.soloapp.service.FriendshipService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -17,8 +18,8 @@ public class FriendshipController {
     FriendshipService friendshipService;
 
     @PostMapping("/request")
-    public ResponseEntity requestFriendship(@RequestBody User userFrom, @RequestBody User userTo) {
-        this.friendshipService.requestFriendship(userFrom, userTo);
+    public ResponseEntity requestFriendship(@RequestBody RequestFriendshipDTO requestFriendshipDTO) {
+        this.friendshipService.requestFriendship(requestFriendshipDTO);
 
         return new ResponseEntity<>("Friendship request has been sent", HttpStatus.CREATED);
     }

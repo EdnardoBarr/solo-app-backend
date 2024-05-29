@@ -1,5 +1,6 @@
 package ednardo.api.soloapp.model.dto;
 
+import ednardo.api.soloapp.enums.ActivityCategory;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -14,5 +15,9 @@ public class ActivityCategoryDTO {
         this.id = id;
         this.label = label;
         this.value = value;
+    }
+
+    public ActivityCategory toEntity() {
+        return ActivityCategory.valueOf(this.value);
     }
 }
