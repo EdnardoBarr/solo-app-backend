@@ -5,7 +5,7 @@ import lombok.Setter;
 
 @Getter
 @Setter
-public class JoinActivityRequestDTO {
+public class ActivityMemberRequestDTO {
     private Long activityId;
     private Long userId;
 }

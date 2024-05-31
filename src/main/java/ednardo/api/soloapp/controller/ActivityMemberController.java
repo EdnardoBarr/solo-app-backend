@@ -1,7 +1,7 @@
 package ednardo.api.soloapp.controller;
 
 import ednardo.api.soloapp.model.ActivityMember;
-import ednardo.api.soloapp.model.dto.JoinActivityRequestDTO;
+import ednardo.api.soloapp.model.dto.ActivityMemberRequestDTO;
 import ednardo.api.soloapp.service.ActivityMemberService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -22,8 +22,8 @@ public class ActivityMemberController {
     }
 
     @PostMapping("/join")
-    public ResponseEntity requestToJoinActivity(@RequestBody JoinActivityRequestDTO joinActivityRequestDTO) {
-        this.activityMemberService.requestToJoin(joinActivityRequestDTO);
+    public ResponseEntity requestToJoinActivity(@RequestBody ActivityMemberRequestDTO activityMemberRequestDTO) {
+        this.activityMemberService.requestToJoin(activityMemberRequestDTO);
 
         return new ResponseEntity<>("Request to join the activity has been sent", HttpStatus.CREATED);
     }
@@ -33,6 +33,13 @@ public class ActivityMemberController {
         this.activityMemberService.update(id, activityMember);
 
         return new ResponseEntity<>("Updated", HttpStatus.NO_CONTENT);
+    }
+
+    @GetMapping("/get-status")
+    public ResponseEntity getStatusActivityMember(ActivityMemberRequestDTO activityMemberRequestDTO) {
+        String status = this.activityMemberService.getStatus(activityMemberRequestDTO);
+
+        return ResponseEntity.ok(status);
     }
 
 }

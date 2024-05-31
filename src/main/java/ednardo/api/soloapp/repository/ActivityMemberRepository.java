@@ -11,4 +11,5 @@ public interface ActivityMemberRepository extends JpaRepository<ActivityMember, 
 
     Optional<ActivityMember> findByActivityIdAndMemberId(Long activityId, Long memberId);
 
+
 }

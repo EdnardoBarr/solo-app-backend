@@ -2,6 +2,7 @@ package ednardo.api.soloapp.service.impl;
 
 import ednardo.api.soloapp.exception.ActivityValidationException;
 import ednardo.api.soloapp.model.Activity;
+import ednardo.api.soloapp.model.ActivityMember;
 import ednardo.api.soloapp.model.LocationActivity;
 import ednardo.api.soloapp.model.User;
 import ednardo.api.soloapp.model.dto.ActivityDTO;

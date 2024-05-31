@@ -2,6 +2,7 @@ package ednardo.api.soloapp.service.impl;
 
 import ednardo.api.soloapp.enums.FriendshipStatus;
 
+import ednardo.api.soloapp.exception.FriendshipException;
 import ednardo.api.soloapp.model.Friendship;
 import ednardo.api.soloapp.model.User;
 import ednardo.api.soloapp.model.dto.RequestFriendshipDTO;
@@ -46,11 +47,11 @@ public class FriendshipServiceImpl implements FriendshipService {
 
             switch (currentStatus) {
                 case FRIENDSHIP_PENDING:
-                    throw new IllegalArgumentException("Friendship request is pending");
+                    throw new FriendshipException("Friendship request is pending");
                 case FRIENDSHIP_ACCEPTED:
-                    throw new IllegalArgumentException("Friendship already exists");
+                    throw new FriendshipException("Friendship already exists");
                 case FRIENDSHIP_BLOCKED:
-                    throw new IllegalArgumentException("Friendship is blocked");
+                    throw new FriendshipException("Friendship is blocked");
                 case FRIENDSHIP_DECLINED:
                 case FRIENDSHIP_REMOVED:
                     Friendship friendship = existingFriendship.get();
@@ -60,7 +61,7 @@ public class FriendshipServiceImpl implements FriendshipService {
                     friendship.setUpdatedAt(LocalDateTime.now());
                     return friendshipRepository.save(friendship);
                 default:
-                    throw new IllegalArgumentException("Friendship request has failed");
+                    throw new FriendshipException("Friendship request has failed");
             }
         }
 
@@ -76,12 +77,39 @@ public class FriendshipServiceImpl implements FriendshipService {
 
     @Override
     @Transactional
-    public void updateFriendship (Long id, Friendship friendship) {
-        Friendship existingFriendship = friendshipRepository.findById(id).orElseThrow(() -> new IllegalArgumentException("Friendship not found"));
+    public void updateFriendship (RequestFriendshipDTO requestFriendshipDTO) {
+        User newUserFrom = userService.getById(requestFriendshipDTO.getFromId());
+        User newUserTo = userService.getById(requestFriendshipDTO.getToId());
 
-        existingFriendship.setStatus(friendship.getStatus());
-        existingFriendship.setUpdatedAt(LocalDateTime.now());
+        Optional<Friendship> existingFriendship = this.friendshipRepository.findFriendshipByUsers(newUserFrom, newUserTo);
 
-        friendshipRepository.save(existingFriendship);
+        if (existingFriendship.isPresent()) {
+            FriendshipStatus status = requestFriendshipDTO.getStatus();
+
+            existingFriendship.get().setStatus(status);
+            existingFriendship.get().setUpdatedAt(LocalDateTime.now());
+        } else {
+            throw new FriendshipException("An error has occured while processing the request");
+        }
+
+        this.friendshipRepository.save(existingFriendship.get());
+    }
+
+    @Override
+    public String getStatus(RequestFriendshipDTO requestFriendshipDTO) {
+        User newUserFrom = userService.getById(requestFriendshipDTO.getFromId());
+        User newUserTo = userService.getById(requestFriendshipDTO.getToId());
+
+        Optional<Friendship> existingFriendship = this.friendshipRepository.findFriendshipByUsers(newUserFrom, newUserTo);
+
+        try {
+            if (existingFriendship.isPresent()) {
+                return existingFriendship.get().getStatus().toString();
+            } else {
+                return "FRIENDSHIP_AVAILABLE";
+            }
+        } catch (Exception exception) {
+            throw new FriendshipException("An error has occurred while processing the request");
+        }
     }
 }

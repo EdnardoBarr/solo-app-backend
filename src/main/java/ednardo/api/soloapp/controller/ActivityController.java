@@ -35,9 +35,9 @@ public class ActivityController {
 
     @PostMapping("/add")
     public ResponseEntity registerActivity (@RequestBody ActivityDTO activityDTO) {
-        activityService.create(activityDTO);
+        Activity activity = activityService.create(activityDTO);
 
-        return new ResponseEntity<>("Activity created", HttpStatus.CREATED);
+        return ResponseEntity.ok(activity);
     }
 
     @PutMapping("/update/{id}")
