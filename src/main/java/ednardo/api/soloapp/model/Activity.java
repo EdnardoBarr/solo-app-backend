@@ -24,7 +24,7 @@ public class Activity {
     private Long id;
    // @JsonIgnore
     @ManyToOne
-    @JoinColumn(name = "user_id")
+    @JoinColumn(name = "owner_id")
     private User owner;
     @OneToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "location_activity_id", referencedColumnName = "id")

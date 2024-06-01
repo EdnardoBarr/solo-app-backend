@@ -1,6 +1,7 @@
 package ednardo.api.soloapp.enums;
 
 public enum ActivityStatus {
+    MEMBER_OWNER,
     MEMBER_PENDING,
     MEMBER_ACCEPTED,
     MEMBER_DECLINED,

@@ -1,6 +1,8 @@
 package ednardo.api.soloapp.service.impl;
 
+import ednardo.api.soloapp.enums.ActivityStatus;
 import ednardo.api.soloapp.exception.ActivityValidationException;
+import ednardo.api.soloapp.exception.UserValidationException;
 import ednardo.api.soloapp.model.Activity;
 import ednardo.api.soloapp.model.ActivityMember;
 import ednardo.api.soloapp.model.LocationActivity;
@@ -9,6 +11,7 @@ import ednardo.api.soloapp.model.dto.ActivityDTO;
 import ednardo.api.soloapp.model.dto.ActivityFilterDTO;
 import ednardo.api.soloapp.model.dto.LocationActivityDTO;
 import ednardo.api.soloapp.repository.ActivityRepository;
+import ednardo.api.soloapp.repository.UserRepository;
 import ednardo.api.soloapp.service.ActivityService;
 import ednardo.api.soloapp.service.LocationActivityService;
 import ednardo.api.soloapp.service.UserService;
@@ -43,10 +46,13 @@ public class ActivityServiceImpl implements ActivityService {
     ActivityRepository activityRepository;
 
     @Autowired
+    UserRepository userRepository;
+
+    @Autowired
     EntityManager entityManager;
 
     @Override
-    public Optional<Activity> getById(Long id){
+    public Optional<Activity> getById(Long id) {
         return this.activityRepository.findById(id);
     }
 
@@ -134,6 +140,19 @@ public class ActivityServiceImpl implements ActivityService {
             Predicate activity = cb.like(upper, "%" + activityFilterDTO.getCategory().name().toUpperCase() + "%");
             predicates.add(activity);
         }
+        if (nonNull(activityFilterDTO.getStatus())) {
+            String status = activityFilterDTO.getStatus().toString();
+            User user = userService.getById(activityFilterDTO.getUserId());
+            if (status == "MEMBER_OWNER") {
+                Predicate activity = cb.equal(activityRoot.get("owner"), user);
+                predicates.add(activity);
+            } else {
+                Join<Activity, ActivityMember> activityMemberJoin = activityRoot.join("member");
+                Expression<String> upper = cb.upper(activityMemberJoin.get("status"));
+                Predicate statusPredicate = cb.like(upper, "%" + activityFilterDTO.getStatus().toString().toUpperCase() + "%");
+                predicates.add(statusPredicate);
+            }
+        }
         if (nonNull(activityFilterDTO.getInitialStartDate())) {
             Predicate activity = cb.greaterThanOrEqualTo(activityRoot.get("startsAt"), activityFilterDTO.getInitialStartDate());
             predicates.add(activity);
@@ -148,7 +167,11 @@ public class ActivityServiceImpl implements ActivityService {
 
     @Override
     public Page<Activity> getAll(ActivityFilterDTO activityFilterDTO, Pageable pageable) {
-       //Page<Activity> allActivities = this.activityRepository.findAll(pageable);
+        //Page<Activity> allActivities = this.activityRepository.findAll(pageable);
+        if (!userRepository.existsById(activityFilterDTO.getUserId())) {
+            throw new UserValidationException("User not found");
+
+        }
         CriteriaBuilder cb = entityManager.getCriteriaBuilder();
         CriteriaQuery<Activity> cq = cb.createQuery(Activity.class);
         Root<Activity> activity = cq.from(Activity.class);
