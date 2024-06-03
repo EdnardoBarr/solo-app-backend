@@ -30,6 +30,7 @@ public class Activity {
     @JoinColumn(name = "location_activity_id", referencedColumnName = "id")
     private LocationActivity location;
     private String title;
+    @Column(columnDefinition = "varchar(5000) default ''")
     private String description;
     @Column(name = "media_location")
     private String mediaLocation;
