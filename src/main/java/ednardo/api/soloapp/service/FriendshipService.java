@@ -16,4 +16,6 @@ public interface FriendshipService {
     Optional<Friendship> getById(Long id);
     String getStatus(RequestFriendshipDTO requestFriendshipDTO);
     Page<User> getFriendshipsPending(Long userTO, Pageable pageable);
+
+    Page<User> getFriendshipsAccepted(Long userId, Pageable pageable);
 }

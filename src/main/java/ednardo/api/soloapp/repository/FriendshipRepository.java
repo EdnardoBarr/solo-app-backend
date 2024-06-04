@@ -18,7 +18,7 @@ public interface FriendshipRepository extends JpaRepository<Friendship, Long> {
 
     @Query("SELECT CASE WHEN f.from.id = :userId THEN f.to ELSE f.from END FROM Friendship f " +
             "WHERE (f.from.id = :userId OR f.to.id = :userId) AND f.status = 'FRIENDSHIP_ACCEPTED'")
-    Optional<List<User>> findFriendsByUserId(@Param("userId") Long id);
+    Page<User> getAcceptedFriendsByUserId(@Param("userId") Long userId, Pageable pageable);
 
     @Query("SELECT CASE WHEN f.from.id = :userId THEN f.to ELSE f.from END FROM Friendship f " +
             "WHERE (f.from.id = :userId OR f.to.id = :userId) AND f.status = 'FRIENDSHIP_BLOCKED'")

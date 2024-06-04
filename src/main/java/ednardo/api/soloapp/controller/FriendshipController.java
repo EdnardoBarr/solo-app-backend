@@ -6,6 +6,7 @@ import ednardo.api.soloapp.service.FriendshipService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -38,8 +39,15 @@ public class FriendshipController {
     }
 
     @GetMapping("/get-pending/{userId}")
-    public ResponseEntity getPending(@PathVariable Long userId, Pageable pageable) {
+    public ResponseEntity getPending(@PathVariable Long userId, @PageableDefault(size = 8, page = 0) Pageable pageable) {
         Page<User> users = this.friendshipService.getFriendshipsPending(userId, pageable);
+
+        return ResponseEntity.ok(users);
+    }
+
+    @GetMapping("/get-accepted/{userId}")
+    public ResponseEntity getAccepted(@PathVariable Long userId, @PageableDefault(size = 8, page = 0) Pageable pageable) {
+        Page<User> users = this.friendshipService.getFriendshipsAccepted(userId, pageable);
 
         return ResponseEntity.ok(users);
     }
