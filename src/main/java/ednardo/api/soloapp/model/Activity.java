@@ -36,6 +36,8 @@ public class Activity {
     private String mediaLocation;
     @Column(name = "max_participants")
     private int maxParticipants;
+    @Column(name = "participants_joined")
+    private int participantsJoined;
     @Enumerated(EnumType.STRING)
     private ActivityCategory category;
     @Column(name = "starts_at")

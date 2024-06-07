@@ -44,14 +44,21 @@ public class ActivityController {
     public ResponseEntity updateActivity(@PathVariable Long id, @RequestBody Activity activity) {
         activityService.update(id, activity);
 
-        return new ResponseEntity<>("Activity updated", HttpStatus.NO_CONTENT);
+        return new ResponseEntity<>("Activity successfully updated", HttpStatus.NO_CONTENT);
     }
 
     @DeleteMapping("/delete/{id}")
     public ResponseEntity deleteActivity(@PathVariable Long id) {
         activityService.deleteById(id);
 
-        return new ResponseEntity<>("Activity deleted", HttpStatus.NO_CONTENT);
+        return new ResponseEntity<>("Activity successfully deleted", HttpStatus.NO_CONTENT);
+    }
+
+    @PutMapping("/add/participant/{userId}")
+    public ResponseEntity addParticipant(Long userId, ActivityDTO activityDTO) {
+        activityService.addParticipant(userId, activityDTO);
+
+        return new ResponseEntity<>("User successfully joined the activity", HttpStatus.NO_CONTENT);
     }
 
 }

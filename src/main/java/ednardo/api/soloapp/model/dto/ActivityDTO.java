@@ -18,6 +18,7 @@ import java.util.List;
 @NoArgsConstructor
 @Builder
 public class ActivityDTO {
+    private Long activityId;
     private Long ownerId;
     private String address;
     private String city;

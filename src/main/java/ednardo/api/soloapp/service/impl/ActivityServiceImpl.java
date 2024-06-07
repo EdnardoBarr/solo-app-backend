@@ -68,6 +68,7 @@ public class ActivityServiceImpl implements ActivityService {
                 .description(activityDTO.getDescription())
                 .mediaLocation("http://")
                 .maxParticipants(activityDTO.getMaxParticipants())
+                .participantsJoined(0)
                 .category(activityDTO.getCategory())
                 .startsAt(activityDTO.getStartsAt())
                 .finishesAt(activityDTO.getFinishesAt())
@@ -87,6 +88,7 @@ public class ActivityServiceImpl implements ActivityService {
         newActivity.setDescription(activity.getDescription());
         newActivity.setMediaLocation(activity.getMediaLocation());
         newActivity.setMaxParticipants(activity.getMaxParticipants());
+        newActivity.setParticipantsJoined(activity.getParticipantsJoined());
         newActivity.setCategory(activity.getCategory());
         newActivity.setStartsAt(activity.getStartsAt());
         newActivity.setFinishesAt(activity.getFinishesAt());
@@ -182,6 +184,22 @@ public class ActivityServiceImpl implements ActivityService {
         TypedQuery<Activity> query = entityManager.createQuery(cq).setMaxResults(pageable.getPageSize()).setFirstResult(offset);
 
         return new PageImpl<>(query.getResultList(), pageable, this.count(activityFilterDTO));
+    }
+
+    @Override
+    public void addParticipant(Long userId, ActivityDTO activityDTO) {
+        Activity activity = activityRepository.findById(activityDTO.getActivityId()).orElseThrow(() -> new ActivityValidationException("Activity not found"));
+
+        if (activityDTO.getOwnerId() == userId) {
+            throw new ActivityValidationException("The user is the owner of this activity and cannot join it");
+        }
+
+        if (activity.getMaxParticipants() > activity.getParticipantsJoined() + 1) {
+            throw new ActivityValidationException("The activity has already reached its maximum number of participants");
+        }
+
+        activity.setParticipantsJoined(activity.getParticipantsJoined() + 1);
+        activityRepository.save(activity);
     }
 
 

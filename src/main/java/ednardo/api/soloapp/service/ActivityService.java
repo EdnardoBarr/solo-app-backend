@@ -14,6 +14,7 @@ public interface ActivityService {
     Activity create(ActivityDTO activityDTO);
     void update(Long id, Activity activity);
     void deleteById(Long id);
+    void addParticipant(Long userId, ActivityDTO activityDTO);
     List<Activity> getAll();
     Page<Activity> getAll(ActivityFilterDTO activityFilterDTO, Pageable pageable);
 
