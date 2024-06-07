@@ -1,14 +1,12 @@
 package ednardo.api.soloapp.service.impl;
 
 import ednardo.api.soloapp.enums.ActivityCategory;
+import ednardo.api.soloapp.enums.FriendshipStatus;
 import ednardo.api.soloapp.enums.RoleName;
 import ednardo.api.soloapp.exception.UserAlreadyExistsException;
 import ednardo.api.soloapp.exception.UserNotFoundException;
 import ednardo.api.soloapp.exception.UserValidationException;
-import ednardo.api.soloapp.model.Activity;
-import ednardo.api.soloapp.model.LocationActivity;
-import ednardo.api.soloapp.model.Role;
-import ednardo.api.soloapp.model.User;
+import ednardo.api.soloapp.model.*;
 import ednardo.api.soloapp.model.dto.*;
 import ednardo.api.soloapp.model.security.JwtUtils;
 import ednardo.api.soloapp.model.security.MyUserDetailsService;
@@ -97,6 +95,34 @@ public class UserServiceImpl implements UserService {
                     .collect(Collectors.toList()));
             predicates.add(interestsPredicate);
         }
+
+        // Exclude users with FRIENDSHIP_ACCEPTED status
+        Subquery<Long> subqueryFrom = cb.createQuery().subquery(Long.class);
+        Root<Friendship> friendshipFromRoot = subqueryFrom.from(Friendship.class);
+        subqueryFrom.select(friendshipFromRoot.get("to").get("id"))
+                .where(cb.and(
+                        cb.equal(friendshipFromRoot.get("from").get("id"), root.get("id")),
+                        cb.equal(friendshipFromRoot.get("status"), FriendshipStatus.FRIENDSHIP_ACCEPTED)
+                ));
+
+        Subquery<Long> subqueryTo = cb.createQuery().subquery(Long.class);
+        Root<Friendship> friendshipToRoot = subqueryTo.from(Friendship.class);
+        subqueryTo.select(friendshipToRoot.get("from").get("id"))
+                .where(cb.and(
+                        cb.equal(friendshipToRoot.get("to").get("id"), root.get("id")),
+                        cb.equal(friendshipToRoot.get("status"), FriendshipStatus.FRIENDSHIP_ACCEPTED)
+                ));
+
+        Predicate notAcceptedFriend = cb.and(
+                cb.not(cb.exists(subqueryFrom)),
+                cb.not(cb.exists(subqueryTo))
+        );
+
+        predicates.add(notAcceptedFriend);
+
+        // Exclude the user himself
+        Predicate notSelf = cb.notEqual(root.get("id"), userFilterDTO.getUserId());
+        predicates.add(notSelf);
 
         return predicates;
     }

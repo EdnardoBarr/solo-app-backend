@@ -11,6 +11,7 @@ import java.util.List;
 @Setter
 @NoArgsConstructor
 public class UserFilterDTO {
+    private Long userId;
     private String givenName;
     private String city;
     private List<ActivityCategoryDTO> interests;

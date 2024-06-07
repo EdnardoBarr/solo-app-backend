@@ -23,9 +23,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 
 import static java.util.Objects.nonNull;
 
@@ -208,13 +206,20 @@ public class FriendshipServiceImpl implements FriendshipService {
 
     @Override
     public Page<User> getFriendshipsAccepted(Long userId, Pageable pageable) {
-        if (!userRepository.existsById(userId)) {
-            throw new UserValidationException("User not found");
-        }
+        Page<User> friendsToPage = friendshipRepository.findFriendsToByUserId(userId, pageable);
+        Page<User> friendsFromPage = friendshipRepository.findFriendsFromByUserId(userId, pageable);
 
-        Page<User> users = this.friendshipRepository.getAcceptedFriendsByUserId(userId, PageRequest.of(pageable.getPageNumber(), pageable.getPageSize()));
+        Set<User> allFriendsSet = new HashSet<>();
+        allFriendsSet.addAll(friendsToPage.getContent());
+        allFriendsSet.addAll(friendsFromPage.getContent());
 
-        return users;
+        List<User> allFriendsList = new ArrayList<>(allFriendsSet);
+
+        int start = (int) pageable.getOffset();
+        int end = Math.min((start + pageable.getPageSize()), allFriendsList.size());
+        Page<User> page = new PageImpl<>(allFriendsList.subList(start, end), pageable, allFriendsList.size());
+
+        return page;
     }
 
 }
