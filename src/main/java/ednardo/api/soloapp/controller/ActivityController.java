@@ -55,10 +55,17 @@ public class ActivityController {
     }
 
     @PutMapping("/add/participant/{userId}")
-    public ResponseEntity addParticipant(Long userId, ActivityDTO activityDTO) {
+    public ResponseEntity addParticipant(@PathVariable Long userId, @RequestBody ActivityDTO activityDTO) {
         activityService.addParticipant(userId, activityDTO);
 
         return new ResponseEntity<>("User successfully joined the activity", HttpStatus.NO_CONTENT);
+    }
+
+    @PutMapping("/decline/participant/{userId}")
+    public ResponseEntity declineParticipant(@PathVariable Long userId, @RequestBody ActivityDTO activityDTO) {
+        activityService.declineParticipant(userId, activityDTO);
+
+        return new ResponseEntity<>("User request to join the activity was successfully declined", HttpStatus.NO_CONTENT);
     }
 
 }

@@ -11,6 +11,7 @@ import ednardo.api.soloapp.model.User;
 import ednardo.api.soloapp.model.dto.ActivityFilterDTO;
 import ednardo.api.soloapp.model.dto.ActivityMemberRequestDTO;
 import ednardo.api.soloapp.repository.ActivityMemberRepository;
+import ednardo.api.soloapp.repository.ActivityRepository;
 import ednardo.api.soloapp.service.ActivityMemberService;
 import ednardo.api.soloapp.service.ActivityService;
 import ednardo.api.soloapp.service.UserService;
@@ -40,6 +41,9 @@ public class ActivityMemberServiceImpl implements ActivityMemberService {
 
     @Autowired
     ActivityMemberRepository activityMemberRepository;
+
+    @Autowired
+    ActivityRepository activityRepository;
 
     @Autowired
     EntityManager entityManager;
@@ -166,6 +170,15 @@ public class ActivityMemberServiceImpl implements ActivityMemberService {
         return predicates;
     }
 
+    @Override
+    public Page<User> getPending(Long activityId, Pageable pageable) {
+        Activity activity = activityRepository.findById(activityId).orElseThrow(() -> new ActivityValidationException("Activity not found"));
 
+        if (!activityMemberRepository.existsByActivityId(activityId)) {
+            return Page.empty(pageable);
+        }
 
+        List<User> users = activityMemberRepository.findUsersPending(activityId);
+        return new PageImpl<>(users, pageable, users.size());
+    }
 }

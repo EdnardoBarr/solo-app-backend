@@ -10,8 +10,10 @@ import ednardo.api.soloapp.model.User;
 import ednardo.api.soloapp.model.dto.ActivityDTO;
 import ednardo.api.soloapp.model.dto.ActivityFilterDTO;
 import ednardo.api.soloapp.model.dto.LocationActivityDTO;
+import ednardo.api.soloapp.repository.ActivityMemberRepository;
 import ednardo.api.soloapp.repository.ActivityRepository;
 import ednardo.api.soloapp.repository.UserRepository;
+import ednardo.api.soloapp.service.ActivityMemberService;
 import ednardo.api.soloapp.service.ActivityService;
 import ednardo.api.soloapp.service.LocationActivityService;
 import ednardo.api.soloapp.service.UserService;
@@ -47,6 +49,9 @@ public class ActivityServiceImpl implements ActivityService {
 
     @Autowired
     UserRepository userRepository;
+
+    @Autowired
+    ActivityMemberRepository activityMemberRepository;
 
     @Autowired
     EntityManager entityManager;
@@ -152,7 +157,9 @@ public class ActivityServiceImpl implements ActivityService {
                 Join<Activity, ActivityMember> activityMemberJoin = activityRoot.join("member");
                 Expression<String> upper = cb.upper(activityMemberJoin.get("status"));
                 Predicate statusPredicate = cb.like(upper, "%" + activityFilterDTO.getStatus().toString().toUpperCase() + "%");
-                predicates.add(statusPredicate);
+                Predicate userPredicate = cb.equal(activityMemberJoin.get("member"), user);
+                Predicate combinedPredicate = cb.and(statusPredicate, userPredicate);
+                predicates.add(combinedPredicate);
             }
         }
         if (nonNull(activityFilterDTO.getInitialStartDate())) {
@@ -189,18 +196,36 @@ public class ActivityServiceImpl implements ActivityService {
     @Override
     public void addParticipant(Long userId, ActivityDTO activityDTO) {
         Activity activity = activityRepository.findById(activityDTO.getActivityId()).orElseThrow(() -> new ActivityValidationException("Activity not found"));
+        ActivityMember activityMember = activityMemberRepository.findByActivityIdAndMemberId(activityDTO.getActivityId(), userId).orElseThrow(() -> new ActivityValidationException("Activity not found"));
 
         if (activityDTO.getOwnerId() == userId) {
             throw new ActivityValidationException("The user is the owner of this activity and cannot join it");
         }
 
-        if (activity.getMaxParticipants() > activity.getParticipantsJoined() + 1) {
+        if (activity.getParticipantsJoined() + 1 > activity.getMaxParticipants()) {
             throw new ActivityValidationException("The activity has already reached its maximum number of participants");
         }
 
         activity.setParticipantsJoined(activity.getParticipantsJoined() + 1);
+        activityMember.setStatus(ActivityStatus.MEMBER_ACCEPTED);
+        activityMember.setUpdatedAt(LocalDateTime.now());
         activityRepository.save(activity);
+        activityMemberRepository.save(activityMember);
     }
+
+    @Override
+    public void declineParticipant(Long userId, ActivityDTO activityDTO) {
+        ActivityMember activityMember = activityMemberRepository.findByActivityIdAndMemberId(activityDTO.getActivityId(), userId).orElseThrow(() -> new ActivityValidationException("Activity not found"));
+
+        if (activityDTO.getOwnerId() == userId) {
+            throw new ActivityValidationException("The user is the owner of this activity");
+        }
+
+        activityMember.setStatus(ActivityStatus.MEMBER_DECLINED);
+        activityMember.setUpdatedAt(LocalDateTime.now());
+        activityMemberRepository.save(activityMember);
+    }
+
 
 
 }

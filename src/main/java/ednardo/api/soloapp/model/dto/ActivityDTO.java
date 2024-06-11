@@ -27,6 +27,7 @@ public class ActivityDTO {
     private String title;
     private String description;
     private int maxParticipants;
+    private int participantsJoined;
     @Enumerated(EnumType.STRING)
     private ActivityCategory category;
     private LocalDateTime startsAt;

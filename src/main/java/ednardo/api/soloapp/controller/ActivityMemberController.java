@@ -1,9 +1,13 @@
 package ednardo.api.soloapp.controller;
 
 import ednardo.api.soloapp.model.ActivityMember;
+import ednardo.api.soloapp.model.User;
 import ednardo.api.soloapp.model.dto.ActivityMemberRequestDTO;
 import ednardo.api.soloapp.service.ActivityMemberService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -41,5 +45,12 @@ public class ActivityMemberController {
 
         return ResponseEntity.ok(status);
     }
+    @GetMapping("/get-pending/{activityId}")
+    public ResponseEntity getPendingUsers(@PathVariable Long activityId, @PageableDefault(size = 8, page = 0) Pageable pageable) {
+        Page<User> users = this.activityMemberService.getPending(activityId, pageable);
+
+        return ResponseEntity.ok(users);
+    }
+
 
 }

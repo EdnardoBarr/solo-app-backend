@@ -34,5 +34,4 @@ public class ActivityMember {
     private ActivityMemberPrivilege privilege;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
-
 }

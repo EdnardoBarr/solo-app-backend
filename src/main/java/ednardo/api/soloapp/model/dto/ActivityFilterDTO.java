@@ -14,6 +14,7 @@ import java.time.LocalDate;
 @Builder
 @AllArgsConstructor
 public class ActivityFilterDTO {
+    private Long ActivityId;
     private Long userId;
     private String title;
     @Enumerated(EnumType.STRING)
