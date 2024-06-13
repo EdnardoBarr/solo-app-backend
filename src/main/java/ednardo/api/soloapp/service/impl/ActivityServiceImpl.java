@@ -226,6 +226,44 @@ public class ActivityServiceImpl implements ActivityService {
         activityMemberRepository.save(activityMember);
     }
 
+    @Override
+    public void removeParticipant(Long userId, ActivityDTO activityDTO) {
+        Activity activity = activityRepository.findById(activityDTO.getActivityId()).orElseThrow(() -> new ActivityValidationException("Activity not found"));
+        ActivityMember activityMember = activityMemberRepository.findByActivityIdAndMemberId(activityDTO.getActivityId(), userId).orElseThrow(() -> new ActivityValidationException("Activity not found"));
+
+        if (activityDTO.getOwnerId() == userId) {
+            throw new ActivityValidationException("The user is the owner of this activity");
+        }
+
+        if (activity.getParticipantsJoined() - 1 < 0) {
+            throw new ActivityValidationException("Unable to remove participant");
+        }
+
+        activity.setParticipantsJoined(activity.getParticipantsJoined() - 1);
+        activityMember.setStatus(ActivityStatus.MEMBER_REMOVED);
+        activityMember.setUpdatedAt(LocalDateTime.now());
+        activityRepository.save(activity);
+        activityMemberRepository.save(activityMember);
+    }
+
+    @Override
+    public void dropParticipant(Long userId, ActivityDTO activityDTO) {
+        Activity activity = activityRepository.findById(activityDTO.getActivityId()).orElseThrow(() -> new ActivityValidationException("Activity not found"));
+        ActivityMember activityMember = activityMemberRepository.findByActivityIdAndMemberId(activityDTO.getActivityId(), userId).orElseThrow(() -> new ActivityValidationException("Activity not found"));
+
+        if (activityDTO.getOwnerId() == userId) {
+            throw new ActivityValidationException("The user is the owner of this activity");
+        }
+
+        if (activity.getParticipantsJoined() - 1 < 0) {
+            throw new ActivityValidationException("Unable to remove participant");
+        }
+        activity.setParticipantsJoined(activity.getParticipantsJoined() - 1);
+        activityMember.setStatus(ActivityStatus.MEMBER_DROPPED);
+        activityMember.setUpdatedAt(LocalDateTime.now());
+        activityRepository.save(activity);
+        activityMemberRepository.save(activityMember);
+    }
 
 
 }

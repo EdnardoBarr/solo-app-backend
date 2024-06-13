@@ -12,6 +12,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 @RestController
 @RequestMapping("/activity/member")
 public class ActivityMemberController {
@@ -45,12 +47,21 @@ public class ActivityMemberController {
 
         return ResponseEntity.ok(status);
     }
+
     @GetMapping("/get-pending/{activityId}")
     public ResponseEntity getPendingUsers(@PathVariable Long activityId, @PageableDefault(size = 8, page = 0) Pageable pageable) {
         Page<User> users = this.activityMemberService.getPending(activityId, pageable);
 
         return ResponseEntity.ok(users);
     }
+
+    @GetMapping("/get-accepted/{activityId}")
+    public ResponseEntity getAcceptedUsers(@PathVariable Long activityId) {
+        List<User> users = this.activityMemberService.getAccepted(activityId);
+
+        return ResponseEntity.ok(users);
+    }
+
 
 
 }

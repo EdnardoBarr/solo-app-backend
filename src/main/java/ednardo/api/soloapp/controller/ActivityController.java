@@ -68,4 +68,18 @@ public class ActivityController {
         return new ResponseEntity<>("User request to join the activity was successfully declined", HttpStatus.NO_CONTENT);
     }
 
+    @PutMapping("/remove/participant/{userId}")
+    public ResponseEntity removeParticipant(@PathVariable Long userId, @RequestBody ActivityDTO activityDTO) {
+        activityService.removeParticipant(userId, activityDTO);
+
+        return new ResponseEntity<>("User was successfully removed from the Activity", HttpStatus.NO_CONTENT);
+    }
+
+    @PutMapping("/drop/participant/{userId}")
+    public ResponseEntity dropParticipant(@PathVariable Long userId, @RequestBody ActivityDTO activityDTO) {
+        activityService.dropParticipant(userId, activityDTO);
+
+        return new ResponseEntity<>("User successfully dropped the Activity", HttpStatus.NO_CONTENT);
+    }
+
 }

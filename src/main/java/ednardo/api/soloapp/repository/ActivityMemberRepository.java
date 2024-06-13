@@ -20,6 +20,9 @@ public interface ActivityMemberRepository extends JpaRepository<ActivityMember, 
     @Query("SELECT a.member FROM ActivityMember a WHERE a.activity.id = :activityId AND a.status = 'MEMBER_PENDING'")
     List<User> findUsersPending(@Param("activityId") Long activityId);
 
+    @Query("SELECT a.member FROM ActivityMember a WHERE a.activity.id = :activityId AND a.status = 'MEMBER_ACCEPTED'")
+    List<User> findUsersAccepted(@Param("activityId") Long activityId);
+
 
 
 

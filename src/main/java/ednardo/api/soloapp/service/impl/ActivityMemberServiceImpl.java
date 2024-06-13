@@ -181,4 +181,16 @@ public class ActivityMemberServiceImpl implements ActivityMemberService {
         List<User> users = activityMemberRepository.findUsersPending(activityId);
         return new PageImpl<>(users, pageable, users.size());
     }
+
+    @Override
+    public List<User> getAccepted(Long activityId) {
+        Activity activity = activityRepository.findById(activityId).orElseThrow(() -> new ActivityValidationException("Activity not found"));
+
+        if (!activityMemberRepository.existsByActivityId(activityId)) {
+            return List.of();
+        }
+
+        List<User> users = activityMemberRepository.findUsersAccepted(activityId);
+        return users;
+    }
 }
