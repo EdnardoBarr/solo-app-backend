@@ -8,6 +8,7 @@ import ednardo.api.soloapp.validation.PasswordMatches;
 import ednardo.api.soloapp.validation.ValidEmail;
 import jakarta.persistence.Column;
 import jakarta.validation.constraints.NotEmpty;
+import lombok.Builder;
 import lombok.Data;
 import org.springframework.lang.NonNull;
 
@@ -17,6 +18,7 @@ import java.util.List;
 
 @PasswordMatches
 @Data
+@Builder
 public class UserDTO {
     @ValidEmail
     private String email;

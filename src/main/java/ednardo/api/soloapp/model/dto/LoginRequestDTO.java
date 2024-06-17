@@ -1,5 +1,8 @@
 package ednardo.api.soloapp.model.dto;
 
+import lombok.AllArgsConstructor;
+
+@AllArgsConstructor
 public class LoginRequestDTO {
     private String email;
     private String password;

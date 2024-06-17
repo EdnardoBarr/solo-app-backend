@@ -76,7 +76,7 @@ public class UserServiceImpl implements UserService {
         return entityManager.createQuery(cq).getSingleResult();
     }
 
-    private List<Predicate> buildPredicates(UserFilterDTO userFilterDTO, CriteriaBuilder cb, Root<User> root) {
+    public List<Predicate> buildPredicates(UserFilterDTO userFilterDTO, CriteriaBuilder cb, Root<User> root) {
         List<Predicate> predicates = new ArrayList<>();
         if (nonNull(userFilterDTO.getGivenName())) {
             Expression<String> upper = cb.upper(root.get("givenName"));
@@ -89,7 +89,7 @@ public class UserServiceImpl implements UserService {
             predicates.add(user);
         }
         if (nonNull(userFilterDTO.getInterests())) {
-            Join<User, ActivityCategory> interestsJoin = root.join("interests");
+            Join<User, ActivityCategory> interestsJoin = root.join("interests", JoinType.LEFT);
             Predicate interestsPredicate = interestsJoin.in(userFilterDTO.getInterests().stream()
                     .map(ActivityCategoryDTO::toEntity)
                     .collect(Collectors.toList()));
@@ -189,7 +189,7 @@ public class UserServiceImpl implements UserService {
         if ((userRepository.existsByEmail(userDTO.getEmail())) && (!userUpdated.getEmail().equals(userDTO.getEmail()))) {
             throw new UserValidationException("Email is already being used by another user");
         }
-        System.out.println(userDTO.getInterests());
+
         userUpdated.setEmail(userDTO.getEmail());
         userUpdated.setGivenName(userDTO.getGivenName());
         userUpdated.setSurname(userDTO.getSurname());

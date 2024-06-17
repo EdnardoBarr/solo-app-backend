@@ -24,13 +24,8 @@ public class RoleServiceImpl implements RoleService {
 
     @Override
     public void createRole(Role role) {
-//        if (roleRepository.existsByRoleNameIgnoreCase(role.getRoleName().toString())) {
-//            throw new RoleValidationException("Role already exists.");
-//        }
-
         try {
             Role newRole = Role.builder().roleName(role.getRoleName())
-             //   .description(role.getDescription())
                 .build();
 
             roleRepository.save(newRole);
