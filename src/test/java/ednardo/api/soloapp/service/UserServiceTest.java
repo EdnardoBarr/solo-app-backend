@@ -169,7 +169,7 @@ public class UserServiceTest {
     }
 
 //    @Test
-//    public void testGetAllPageUsersSuccess() {
+//    public void testGetAllPageUsersWithFiltersSuccess() {
 //        ActivityCategoryDTO activityCategoryDTO = new ActivityCategoryDTO(1, "GYM", "GYM");
 //        UserFilterDTO userFilterDTO = UserFilterDTO.builder()
 //                .userId(1L)
