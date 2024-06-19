@@ -13,4 +13,10 @@ public class RequestFriendshipDTO {
     private Long toId;
     @Enumerated(EnumType.STRING)
     private FriendshipStatus status;
+
+    public RequestFriendshipDTO(Long fromId, Long toId, FriendshipStatus status) {
+        this.fromId = fromId;
+        this.toId = toId;
+        this.status = status;
+    }
 }
