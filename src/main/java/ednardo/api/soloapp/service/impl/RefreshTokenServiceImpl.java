@@ -15,6 +15,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 
 import java.security.Principal;
@@ -42,7 +43,8 @@ public class RefreshTokenServiceImpl implements RefreshTokenService {
                 .map(refreshToken -> {
 
                     String email = refreshToken.getUser().getEmail();
-                    String token = jwtUtils.generateToken(userDetailsService.loadUserByUsername(email));
+                    UserDetails userDetails = userDetailsService.loadUserByUsername(email);
+                    String token = jwtUtils.generateToken(userDetails);
 
                     refreshToken.setExpirationDate(LocalDateTime.now().plusSeconds(refreshTokenDurationSec));
                     refreshToken.setToken(UUID.randomUUID().toString());
@@ -68,8 +70,8 @@ public class RefreshTokenServiceImpl implements RefreshTokenService {
 
     @Override
     public RefreshToken createRefreshToken(String email) {
-        User user = userRepository.findByEmail(email).orElseThrow(()->new UserNotFoundException("User not found"));
-      //  RefreshToken refreshToken = tokenRepository.findByUserCode(user.getId()).get();
+        User user = userRepository.findByEmail(email).orElseThrow(() -> new UserNotFoundException("User not found"));
+        //  RefreshToken refreshToken = tokenRepository.findByUserCode(user.getId()).get();
 
         if (tokenRepository.findByUserCode(user.getId()).isPresent()) {
             tokenRepository.delete(tokenRepository.findByUserCode(user.getId()).get());
@@ -82,12 +84,14 @@ public class RefreshTokenServiceImpl implements RefreshTokenService {
         newRefreshToken.setExpirationDate(LocalDateTime.now().plusSeconds(refreshTokenDurationSec));
         newRefreshToken.setToken(UUID.randomUUID().toString());
 
-        return this.tokenRepository.save(newRefreshToken);
+        this.tokenRepository.save(newRefreshToken);
+
+        return newRefreshToken;
     }
 
     @Override
     public void deleteRefreshToken(Principal principal) {
-        RefreshToken refreshToken = tokenRepository.findByUserCode(userRepository.findByEmail(principal.getName()).get().getId()).orElseThrow(()-> new JWTException("Refresh token not found"));
+        RefreshToken refreshToken = tokenRepository.findByUserCode(userRepository.findByEmail(principal.getName()).get().getId()).orElseThrow(() -> new JWTException("Refresh token not found"));
         SecurityContextHolder.clearContext();
 
         this.tokenRepository.delete(refreshToken);
