@@ -10,4 +10,10 @@ public class ActivityCommentDTO {
     private Long activityId;
     private Long userId;
     private String comment;
+
+    public ActivityCommentDTO(Long activityId, Long userId, String comment) {
+        this.activityId = activityId;
+        this.userId = userId;
+        this.comment = comment;
+    }
 }
