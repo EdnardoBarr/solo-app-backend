@@ -62,7 +62,7 @@ public class ActivityMemberServiceImpl implements ActivityMemberService {
             throw new ActivityValidationException("User is the owner of the activity");
         }
 
-        try {
+//        try {
             Optional<ActivityMember> existingActivityMember = activityMemberRepository.findByActivityIdAndMemberId(activityMemberRequestDTO.getActivityId(), activityMemberRequestDTO.getUserId());
             if (existingActivityMember.isPresent()) {
                 ActivityStatus currentStatus = existingActivityMember.get().getStatus();
@@ -81,8 +81,8 @@ public class ActivityMemberServiceImpl implements ActivityMemberService {
                         activityMember.setUpdatedAt(LocalDateTime.now());
 
                         activityMemberRepository.save(activityMember);
-                    default:
-                        throw new ActivityValidationException("An error occurred while processing your request to join the activity.");
+              //      default:
+               //         throw new ActivityValidationException("An error occurred while processing your request to join the activity.");
                 }
             } else {
                 ActivityMember newActivityMember = ActivityMember.builder()
@@ -96,9 +96,9 @@ public class ActivityMemberServiceImpl implements ActivityMemberService {
 
                 this.activityMemberRepository.save(newActivityMember);
             }
-        } catch (Exception exception) {
-            throw new ActivityValidationException("An error occurred while processing the request");
-        }
+//        } catch (Exception exception) {
+//            throw new ActivityValidationException("A error occurred while processing the request");
+//        }
     }
 
     @Override
