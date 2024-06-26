@@ -15,7 +15,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
-@RequestMapping("/activity/member")
+@RequestMapping("/api/v1/activity/member")
 public class ActivityMemberController {
     @Autowired
     ActivityMemberService activityMemberService;

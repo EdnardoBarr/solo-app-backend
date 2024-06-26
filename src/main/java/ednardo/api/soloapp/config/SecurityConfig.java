@@ -66,16 +66,17 @@ public class SecurityConfig {
     };
 
     public static final String[] SWAGGER_WHITELIST = {
-            "/swagger-ui/",
-            "/v3/api-docs/",
-            "/swagger-resources/",
+            "/swagger-ui/**",
+            "/v3/api-docs/**",
+            "/swagger-resources/**",
             "/login",
-            "/hello/**",
-            "/user/login",
+            "/api/v1/hello/**",
+            "/api/v1/user/hello",
+            "/api/v1/user/login",
             //"/user/logged",
             "/role/",
-            "/user/register",
-            "/user/refresh-token",
+            "/api/v1/user/register",
+            "/api/v1/user/refresh-token",
     };
 
     @Bean

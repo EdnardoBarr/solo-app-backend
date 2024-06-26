@@ -28,7 +28,7 @@ import java.security.Principal;
 
 @Slf4j
 @RestController
-@RequestMapping("/user")
+@RequestMapping("/api/v1/user")
 @CrossOrigin("http://localhost:5173")
 public class UserController {
     @Autowired
@@ -93,5 +93,10 @@ public class UserController {
     @GetMapping("/logged")
     public UserDetails getUser(Principal principal) {
         return this.userDetailsService.loadUserByUsername(principal.getName());
+    }
+
+    @GetMapping("/hello")
+    public String sayHello() {
+        return "Hello";
     }
 }
