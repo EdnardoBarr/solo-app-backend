@@ -36,4 +36,7 @@ public interface FriendshipRepository extends JpaRepository<Friendship, Long> {
 
     @Query("SELECT f.from From Friendship f WHERE (f.to.id = :userId) AND f.status = 'FRIENDSHIP_PENDING'")
     Page<User> getPendingFriendshipsByUserId(@Param("userId") Long userId, Pageable pageable);
+
+    @Query("SELECT COUNT(f) FROM Friendship f WHERE (f.from.id = :userId OR f.to.id = :userId) AND f.status = 'FRIENDSHIP_ACCEPTED'")
+    int countFriendshipsByUserId(@Param("userId") Long userId);
 }

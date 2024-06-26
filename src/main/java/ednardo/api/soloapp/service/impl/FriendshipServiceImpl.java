@@ -189,18 +189,8 @@ public class FriendshipServiceImpl implements FriendshipService {
 
         Page<User> users = this.friendshipRepository.getPendingFriendshipsByUserId(userTo, PageRequest.of(pageable.getPageNumber(), pageable.getPageSize()));
 
-
-//        CriteriaBuilder cb = entityManager.getCriteriaBuilder();
-//        CriteriaQuery<Friendship> cq = cb.createQuery(Friendship.class);
-//        Root<Friendship> root = cq.from(Friendship.class);
-//        List<Predicate> predicates = this.buildPredicates(userTo, cb, root);
-//
-//        cq.where(predicates.toArray(Predicate[]::new));
         int offset = pageable.getPageSize() * pageable.getPageNumber();
-//        TypedQuery<Friendship> query = friendshipRepository.getPendingFriendshipsByUserId(userTo).get().setMaxResults(pageable.getPageSize()).setFirstResult(offset);
-//
-      //  Pageable topEight = new PageRequest(0, 8);
-      //  return new PageImpl<>(users, PageRequest.of(0, 8));
+
         return users;
     }
 
@@ -220,6 +210,17 @@ public class FriendshipServiceImpl implements FriendshipService {
         Page<User> page = new PageImpl<>(allFriendsList.subList(start, end), pageable, allFriendsList.size());
 
         return page;
+    }
+
+    @Override
+    public int countFriendships(Long userId) {
+        if (!userRepository.existsById(userId)) {
+            throw new UserValidationException("User not found");
+        }
+
+        int count = friendshipRepository.countFriendshipsByUserId(userId);
+
+        return count;
     }
 
 }

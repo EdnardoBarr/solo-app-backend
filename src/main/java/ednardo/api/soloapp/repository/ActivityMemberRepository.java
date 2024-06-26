@@ -23,6 +23,12 @@ public interface ActivityMemberRepository extends JpaRepository<ActivityMember, 
     @Query("SELECT a.member FROM ActivityMember a WHERE a.activity.id = :activityId AND a.status = 'MEMBER_ACCEPTED'")
     List<User> findUsersAccepted(@Param("activityId") Long activityId);
 
+    @Query("SELECT COUNT(a) FROM ActivityMember a WHERE a.member.id = :userId AND a.status = 'MEMBER_PENDING'")
+    int countMembersPendingByUserId(@Param("userId") Long userId);
+
+    @Query("SELECT COUNT(a) FROM ActivityMember a WHERE a.member.id = :userId AND a.status = 'MEMBER_ACCEPTED'")
+    int countMembersAcceptedByUserId(@Param("userId") Long userId);
+
 
 
 

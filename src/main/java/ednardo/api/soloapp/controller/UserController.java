@@ -1,10 +1,9 @@
 package ednardo.api.soloapp.controller;
 
-import ednardo.api.soloapp.model.Activity;
 import ednardo.api.soloapp.model.RefreshToken;
 import ednardo.api.soloapp.model.User;
 import ednardo.api.soloapp.model.dto.*;
-import ednardo.api.soloapp.model.security.MyUserDetailsService;
+import ednardo.api.soloapp.service.impl.MyUserDetailsService;
 import ednardo.api.soloapp.service.RefreshTokenService;
 import ednardo.api.soloapp.service.UserService;
 import jakarta.servlet.http.HttpServletRequest;
@@ -16,19 +15,15 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.util.MultiValueMap;
 import org.springframework.web.bind.annotation.*;
 
 import java.security.Principal;
 
 @Slf4j
 @RestController
-@RequestMapping("/user")
+@RequestMapping("/api/v1/user")
 @CrossOrigin("http://localhost:5173")
 public class UserController {
     @Autowired
@@ -93,5 +88,10 @@ public class UserController {
     @GetMapping("/logged")
     public UserDetails getUser(Principal principal) {
         return this.userDetailsService.loadUserByUsername(principal.getName());
+    }
+
+    @GetMapping("/hello")
+    public String sayHello() {
+        return "Hello";
     }
 }

@@ -16,7 +16,9 @@ public interface ActivityMemberService {
     void update(Long id, ActivityMember activityMember);
     String getStatus(ActivityMemberRequestDTO activityMemberRequestDTO);
     Page<User> getPending(Long activityId, Pageable pageable);
+    int countPending(Long userId);
     List<User> getAccepted(Long activityId);
+    int countAccepted(Long userId);
 
 
 }

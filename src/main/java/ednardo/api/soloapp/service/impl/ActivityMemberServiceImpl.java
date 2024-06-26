@@ -4,6 +4,7 @@ import ednardo.api.soloapp.enums.ActivityMemberPrivilege;
 import ednardo.api.soloapp.enums.ActivityStatus;
 import ednardo.api.soloapp.exception.ActivityMemberException;
 import ednardo.api.soloapp.exception.ActivityValidationException;
+import ednardo.api.soloapp.exception.UserValidationException;
 import ednardo.api.soloapp.model.Activity;
 import ednardo.api.soloapp.model.ActivityMember;
 import ednardo.api.soloapp.model.LocationActivity;
@@ -12,6 +13,7 @@ import ednardo.api.soloapp.model.dto.ActivityFilterDTO;
 import ednardo.api.soloapp.model.dto.ActivityMemberRequestDTO;
 import ednardo.api.soloapp.repository.ActivityMemberRepository;
 import ednardo.api.soloapp.repository.ActivityRepository;
+import ednardo.api.soloapp.repository.UserRepository;
 import ednardo.api.soloapp.service.ActivityMemberService;
 import ednardo.api.soloapp.service.ActivityService;
 import ednardo.api.soloapp.service.UserService;
@@ -44,6 +46,9 @@ public class ActivityMemberServiceImpl implements ActivityMemberService {
 
     @Autowired
     ActivityRepository activityRepository;
+
+    @Autowired
+    UserRepository userRepository;
 
     @Autowired
     EntityManager entityManager;
@@ -192,5 +197,25 @@ public class ActivityMemberServiceImpl implements ActivityMemberService {
 
         List<User> users = activityMemberRepository.findUsersAccepted(activityId);
         return users;
+    }
+
+    @Override
+    public int countPending(Long userId) {
+        if (!userRepository.existsById(userId)) {
+            throw new UserValidationException("User not found");
+        }
+
+        int count = activityMemberRepository.countMembersPendingByUserId(userId);
+        return count;
+    }
+
+    @Override
+    public int countAccepted(Long userId) {
+        if (!userRepository.existsById(userId)) {
+            throw new UserValidationException("User not found");
+        }
+
+        int count = activityMemberRepository.countMembersAcceptedByUserId(userId);
+        return count;
     }
 }

@@ -11,7 +11,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-@RequestMapping("/friendship")
+@RequestMapping("/api/v1/friendship")
 @RestController
 public class FriendshipController {
     @Autowired
@@ -50,5 +50,12 @@ public class FriendshipController {
         Page<User> users = this.friendshipService.getFriendshipsAccepted(userId, pageable);
 
         return ResponseEntity.ok(users);
+    }
+
+    @GetMapping("count/friendship/{userId}")
+    public ResponseEntity countFriendships(@PathVariable Long userId) {
+        int count = this.friendshipService.countFriendships(userId);
+
+        return ResponseEntity.ok(count);
     }
 }

@@ -15,7 +15,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
-@RequestMapping("/activity/member")
+@RequestMapping("/api/v1/activity/member")
 public class ActivityMemberController {
     @Autowired
     ActivityMemberService activityMemberService;
@@ -60,6 +60,20 @@ public class ActivityMemberController {
         List<User> users = this.activityMemberService.getAccepted(activityId);
 
         return ResponseEntity.ok(users);
+    }
+
+    @GetMapping("/count/pending/{userId}")
+    public ResponseEntity countPending(@PathVariable Long userId) {
+        int count = this.activityMemberService.countPending(userId);
+
+        return ResponseEntity.ok(count);
+    }
+
+    @GetMapping("/count/accepted/{userId}")
+    public ResponseEntity countAccepted(@PathVariable Long userId) {
+        int count = this.activityMemberService.countAccepted(userId);
+
+        return ResponseEntity.ok(count);
     }
 
 

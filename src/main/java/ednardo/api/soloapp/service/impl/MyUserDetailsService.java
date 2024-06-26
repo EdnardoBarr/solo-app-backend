@@ -1,4 +1,4 @@
-package ednardo.api.soloapp.model.security;
+package ednardo.api.soloapp.service.impl;
 
 import ednardo.api.soloapp.exception.UserNotFoundException;
 import ednardo.api.soloapp.exception.UserValidationException;

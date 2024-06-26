@@ -1,4 +1,4 @@
-package ednardo.api.soloapp.model.security;
+package ednardo.api.soloapp.util;
 
 import com.auth0.jwt.JWT;
 import com.auth0.jwt.algorithms.Algorithm;

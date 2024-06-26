@@ -13,7 +13,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-@RequestMapping("/activity")
+@RequestMapping("/api/v1/activity")
 @RestController
 public class ActivityController {
     @Autowired
@@ -81,5 +81,4 @@ public class ActivityController {
 
         return new ResponseEntity<>("User successfully dropped the Activity", HttpStatus.NO_CONTENT);
     }
-
 }

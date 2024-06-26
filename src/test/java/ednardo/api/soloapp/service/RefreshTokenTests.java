@@ -1,16 +1,11 @@
 package ednardo.api.soloapp.service;
 
-import ednardo.api.soloapp.enums.FriendshipStatus;
 import ednardo.api.soloapp.exception.TokenRefreshException;
 import ednardo.api.soloapp.exception.UserNotFoundException;
-import ednardo.api.soloapp.model.Friendship;
 import ednardo.api.soloapp.model.RefreshToken;
 import ednardo.api.soloapp.model.User;
-import ednardo.api.soloapp.model.dto.RefreshTokenResponseDTO;
-import ednardo.api.soloapp.model.dto.RequestFriendshipDTO;
-import ednardo.api.soloapp.model.dto.UserDetailsDTO;
-import ednardo.api.soloapp.model.security.JwtUtils;
-import ednardo.api.soloapp.model.security.MyUserDetailsService;
+import ednardo.api.soloapp.util.JwtUtils;
+import ednardo.api.soloapp.service.impl.MyUserDetailsService;
 import ednardo.api.soloapp.repository.RefreshTokenRepository;
 import ednardo.api.soloapp.repository.UserRepository;
 import ednardo.api.soloapp.service.impl.RefreshTokenServiceImpl;
@@ -21,8 +16,6 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.test.util.ReflectionTestUtils;
 
 import java.time.LocalDateTime;
