@@ -152,7 +152,7 @@ public class UserServiceImpl implements UserService {
             throw new UserValidationException("This login email already exists.");
         }
 
-        Role role = roleRepository.findByRoleNameOrDefaultRoleName(userDTO.getRoleName(), RoleName.ROLE_DEFAULT);
+     //   Role role = roleRepository.findByRoleNameOrDefaultRoleName(userDTO.getRoleName(), RoleName.ROLE_DEFAULT);
 
         User newUser = User.builder()
                 .email(userDTO.getEmail())
@@ -163,7 +163,7 @@ public class UserServiceImpl implements UserService {
                 .city(userDTO.getCity())
                 .dateOfBirth("")
                 .active(true)
-                .roles(List.of(role))
+                .roles(List.of())
                 .interests(List.of())
                 .pictureLocation("")
                 .bio("")

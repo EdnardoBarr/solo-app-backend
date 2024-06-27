@@ -41,7 +41,7 @@ public class UserController {
     }
 
     @GetMapping("/all")
-    public ResponseEntity getAllUsers(UserFilterDTO userFilterDTO, @PageableDefault(size = 4, page = 0) Pageable pageable) {
+    public ResponseEntity getAllUsers(UserFilterDTO userFilterDTO, @PageableDefault(size = 6, page = 0) Pageable pageable) {
         Page<User> users = this.userService.getAll(userFilterDTO, pageable);
 
         return ResponseEntity.ok(users);
